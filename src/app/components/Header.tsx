@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { label: "Ana Sayfa", href: "#" },
@@ -24,22 +25,20 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <motion.div
+          <motion.a
+            href="#"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
+            className="flex items-center"
+            aria-label="Meres Tohum ana sayfa"
           >
-            <h1
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '1.75rem',
-                fontWeight: 700,
-                color: 'var(--primary-green-dark)',
-              }}
-            >
-              Meres Tohum
-            </h1>
-          </motion.div>
+            <img
+              src={logo}
+              alt="Meres Tohum"
+              className="h-14 w-auto lg:h-16"
+            />
+          </motion.a>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
