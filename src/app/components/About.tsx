@@ -81,7 +81,7 @@ export function About() {
                     lineHeight: 1.7,
                   }}
                 >
-                  1985 yılından bu yana Türk tarımına hizmet eden Meres Tohum, kaliteli tohum, fide ve gübre üretimi ile çiftçilerimizin yanındadır. Organik ve sertifikalı ürünlerimizle sürdürülebilir tarımı destekliyoruz.
+                  2026 yılından bu yana Türk tarımına hizmet eden Meres Tohum, kaliteli tohum, fide ve gübre üretimi ile çiftçilerimizin yanındadır. Organik ve sertifikalı ürünlerimizle sürdürülebilir tarımı destekliyoruz.
                 </p>
               </div>
             </div>
