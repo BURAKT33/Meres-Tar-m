@@ -1,12 +1,14 @@
 export type GidaRadariRecord = {
   id: string;
-  name: string;
-  brand: string;
-  category: string;
-  barcode?: string;
-  year: number;
+  sourceFile: string;
+  sourceLabel: string;
+  announcementDate: string;
+  company: string;
+  product: string;
   issue: string;
-  source: string;
+  batch: string;
+  location: string;
+  productGroup: string;
 };
 
 export type GidaRadariMatch = {
@@ -14,7 +16,7 @@ export type GidaRadariMatch = {
   score: number;
 };
 
-const DATA_URL = "/data/products.json";
+const DATA_URL = "/data/records.json";
 
 let cachedRecords: GidaRadariRecord[] | null = null;
 
@@ -63,7 +65,7 @@ function similarityScore(a: string, b: string): number {
 }
 
 function tokenOverlapScore(query: string, target: string): number {
-  const queryTokens = query.split(" ").filter(Boolean);
+  const queryTokens = query.split(" ").filter((token) => token.length >= 2);
   const targetTokens = new Set(target.split(" ").filter(Boolean));
   if (!queryTokens.length) return 0;
 
@@ -82,12 +84,14 @@ function scoreRecord(query: string, record: GidaRadariRecord): number {
   if (!normalizedQuery) return 0;
 
   const fields = [
-    { value: record.name, weight: 1 },
-    { value: record.brand, weight: 0.95 },
-    { value: record.category, weight: 0.75 },
-    { value: record.barcode ?? "", weight: 1.1 },
-    { value: `${record.brand} ${record.name}`, weight: 1.05 },
-    { value: record.issue, weight: 0.35 },
+    { value: record.company, weight: 1.2 },
+    { value: record.product, weight: 1 },
+    { value: `${record.company} ${record.product}`, weight: 1.05 },
+    { value: record.productGroup, weight: 0.85 },
+    { value: record.issue, weight: 0.55 },
+    { value: record.location, weight: 0.45 },
+    { value: record.batch, weight: 0.4 },
+    { value: record.sourceLabel, weight: 0.25 },
   ];
 
   let bestScore = 0;
@@ -138,7 +142,7 @@ export async function loadGidaRadariRecords(): Promise<GidaRadariRecord[]> {
 export function searchGidaRadariRecords(
   query: string,
   records: GidaRadariRecord[],
-  limit = 5,
+  limit = 8,
 ): GidaRadariMatch[] {
   const trimmedQuery = query.trim();
   if (!trimmedQuery) return [];
@@ -151,8 +155,4 @@ export function searchGidaRadariRecords(
     .filter((match) => match.score >= 35)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
-}
-
-export function hasFraudRecord(issue: string): boolean {
-  return !normalize(issue).includes("kayit bulunamadi");
 }

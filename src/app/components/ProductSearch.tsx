@@ -3,13 +3,12 @@ import {
   Search,
   AlertTriangle,
   Radar,
-  CheckCircle2,
   Loader2,
+  Building2,
 } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import {
   GidaRadariMatch,
-  hasFraudRecord,
   loadGidaRadariRecords,
   searchGidaRadariRecords,
 } from "@/lib/gidaradariSearch";
@@ -132,7 +131,7 @@ export function ProductSearch() {
                 type="text"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Ürün adı veya barkod gir (örnek: bal, zeytinyağı, Yöre Bal)"
+                placeholder="Firma, ürün veya marka adı gir (örnek: Yöre Bal, peynir, sucuk)"
                 className="flex-1 bg-transparent outline-none"
                 style={{
                   fontFamily: "var(--font-body)",
@@ -203,10 +202,7 @@ export function ProductSearch() {
                   sonuç listelendi
                 </p>
 
-                {results.map(({ record, score }, index) => {
-                  const isFraud = hasFraudRecord(record.issue);
-
-                  return (
+                {results.map(({ record, score }, index) => (
                     <motion.div
                       key={record.id}
                       initial={{ opacity: 0, y: 10 }}
@@ -214,26 +210,16 @@ export function ProductSearch() {
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                       className="rounded-3xl p-6 shadow-lg"
                       style={{
-                        backgroundColor: isFraud
-                          ? "rgba(255, 140, 66, 0.1)"
-                          : "rgba(45, 106, 79, 0.08)",
-                        border: `2px solid ${isFraud ? "var(--accent-warning)" : "var(--primary-green-light)"}`,
+                        backgroundColor: "rgba(255, 140, 66, 0.1)",
+                        border: "2px solid var(--accent-warning)",
                       }}
                     >
                       <div className="flex items-start gap-4">
                         <div
                           className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{
-                            backgroundColor: isFraud
-                              ? "var(--accent-warning)"
-                              : "var(--primary-green-dark)",
-                          }}
+                          style={{ backgroundColor: "var(--accent-warning)" }}
                         >
-                          {isFraud ? (
-                            <AlertTriangle size={24} color="#ffffff" />
-                          ) : (
-                            <CheckCircle2 size={24} color="#ffffff" />
-                          )}
+                          <AlertTriangle size={24} color="#ffffff" />
                         </div>
 
                         <div className="flex-1">
@@ -246,7 +232,7 @@ export function ProductSearch() {
                                 color: "var(--text-dark)",
                               }}
                             >
-                              {record.brand} · {record.name}
+                              {record.company}
                             </h4>
                             <span
                               className="px-2 py-1 rounded-full text-xs"
@@ -261,6 +247,18 @@ export function ProductSearch() {
                           </div>
 
                           <p
+                            className="mb-2 flex items-start gap-1"
+                            style={{
+                              fontFamily: "var(--font-body)",
+                              fontSize: "0.95rem",
+                              color: "var(--text-gray)",
+                            }}
+                          >
+                            <Building2 size={14} className="mt-1 flex-shrink-0" />
+                            <span>Ürün: {record.product}</span>
+                          </p>
+
+                          <p
                             className="mb-2"
                             style={{
                               fontFamily: "var(--font-body)",
@@ -268,29 +266,38 @@ export function ProductSearch() {
                               color: "var(--text-gray)",
                             }}
                           >
-                            Kategori: {record.category}
-                            {record.barcode ? ` · Barkod: ${record.barcode}` : ""}
+                            Uygunsuzluk: {record.issue}
+                          </p>
+
+                          <p
+                            className="mb-2"
+                            style={{
+                              fontFamily: "var(--font-body)",
+                              fontSize: "0.875rem",
+                              color: "var(--text-gray)",
+                            }}
+                          >
+                            {record.productGroup}
+                            {record.location ? ` · ${record.location}` : ""}
+                            {record.announcementDate ? ` · ${record.announcementDate}` : ""}
                           </p>
 
                           <p
                             style={{
                               fontFamily: "var(--font-body)",
-                              fontSize: "1rem",
+                              fontSize: "0.875rem",
                               color: "var(--text-dark)",
                               lineHeight: 1.6,
                             }}
                           >
-                            <strong>
-                              {record.year} yılında {record.issue.toLowerCase()}
-                            </strong>
+                            Kaynak: {record.sourceLabel}
                             <br />
-                            ({record.source})
+                            (T.C. Tarım ve Orman Bakanlığı resmi kayıtları)
                           </p>
                         </div>
                       </div>
                     </motion.div>
-                  );
-                })}
+                  ))}
               </>
             ) : (
               <div
@@ -307,7 +314,7 @@ export function ProductSearch() {
                     color: "var(--text-gray)",
                   }}
                 >
-                  Aramanıza yakın bir kayıt bulunamadı. Farklı bir ürün adı veya barkod deneyin.
+                  Aramanıza yakın bir firma veya ürün kaydı bulunamadı. Farklı bir firma veya ürün adı deneyin.
                 </p>
               </div>
             )}
@@ -327,7 +334,7 @@ export function ProductSearch() {
           >
             {isLoadingData
               ? "GıdaRadarı verileri yükleniyor..."
-              : "💡 İpucu: Ürün adını veya barkod numarasını girerek en yakın kayıtları listeleyebilirsiniz"}
+              : "💡 İpucu: Firma adı, ürün veya marka yazarak Bakanlık kayıtlarında arama yapabilirsiniz"}
           </motion.p>
         )}
       </div>
