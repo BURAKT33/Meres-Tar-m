@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Search, AlertTriangle } from "lucide-react";
+import { Search, AlertTriangle, Radar } from "lucide-react";
 import { useState } from "react";
 
 export function ProductSearch() {
@@ -15,6 +15,25 @@ export function ProductSearch() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
+          <div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-5"
+            style={{
+              backgroundColor: 'rgba(255, 140, 66, 0.12)',
+              border: '1px solid var(--accent-warning)',
+            }}
+          >
+            <Radar size={18} style={{ color: 'var(--accent-warning)' }} />
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: '0.95rem',
+                fontWeight: 600,
+                color: 'var(--accent-warning)',
+              }}
+            >
+              GıdaRadarı
+            </span>
+          </div>
           <h2
             className="mb-4"
             style={{
@@ -33,7 +52,7 @@ export function ProductSearch() {
               color: 'var(--text-gray)',
             }}
           >
-            Bakanlık kayıtlarından anlık sorgulama yapın
+            <strong style={{ color: 'var(--text-dark)' }}>GıdaRadarı</strong> ile T.C. Tarım ve Orman Bakanlığı kayıtlarından anlık sorgulama yapın
           </p>
         </motion.div>
 
