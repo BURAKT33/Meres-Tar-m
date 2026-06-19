@@ -130,7 +130,7 @@ export function ProductSearch() {
   useEffect(() => {
     loadGidaRadariRecords()
       .catch(() => {
-        setError("GıdaRadarı verileri yüklenemedi. Lütfen daha sonra tekrar deneyin.");
+        // Ön yükleme başarısız olursa arama sırasında tekrar denenecek.
       })
       .finally(() => {
         setIsLoadingData(false);
@@ -175,8 +175,12 @@ export function ProductSearch() {
       const matches = searchGidaRadariRecords(trimmedQuery, records, 8);
       setResults(matches);
       setHasSearched(true);
-    } catch {
-      setError("Arama sırasında bir hata oluştu. Lütfen tekrar deneyin.");
+    } catch (searchError) {
+      const message =
+        searchError instanceof Error
+          ? searchError.message
+          : "Arama sırasında bir hata oluştu.";
+      setError(message);
       setResults([]);
       setHasSearched(true);
     } finally {

@@ -157,6 +157,54 @@ export function searchGidaRadariRecords(
     .slice(0, limit);
 }
 
+const OCR_STOP_WORDS = new Set([
+  "sut",
+  "gida",
+  "urun",
+  "urunleri",
+  "urunler",
+  "marka",
+  "tic",
+  "san",
+  "ltd",
+  "sti",
+  "anonim",
+  "sirketi",
+  "ve",
+  "icin",
+  "ile",
+  "gr",
+  "gram",
+  "ml",
+  "kg",
+  "adet",
+  "tam",
+  "yagli",
+  "yag",
+  "taze",
+  "islem",
+  "gormus",
+  "isil",
+  "net",
+  "icerik",
+  "miktari",
+  "skt",
+  "tet",
+  "tett",
+  "parti",
+  "seri",
+  "no",
+  "the",
+  "and",
+]);
+
+function isUsefulOcrToken(token: string): boolean {
+  if (token.length < 3) return false;
+  if (OCR_STOP_WORDS.has(token)) return false;
+  if (/^\d+$/.test(token)) return false;
+  return true;
+}
+
 function extractOcrSearchCandidates(ocrText: string): string[] {
   const candidates = new Set<string>();
   const trimmed = ocrText.trim();
@@ -170,11 +218,18 @@ function extractOcrSearchCandidates(ocrText: string): string[] {
     if (cleanLine.length >= 3) {
       candidates.add(cleanLine);
     }
+
+    const slashParts = cleanLine.split("/").map((part) => part.trim());
+    for (const part of slashParts) {
+      if (part.length >= 3) {
+        candidates.add(part);
+      }
+    }
   }
 
   const words = normalize(ocrText)
     .split(" ")
-    .filter((word) => word.length >= 3);
+    .filter(isUsefulOcrToken);
 
   for (const word of words) {
     candidates.add(word);
@@ -182,7 +237,10 @@ function extractOcrSearchCandidates(ocrText: string): string[] {
 
   for (let index = 0; index < words.length; index++) {
     for (let length = 2; length <= 4 && index + length <= words.length; length++) {
-      candidates.add(words.slice(index, index + length).join(" "));
+      const phrase = words.slice(index, index + length).join(" ");
+      if (phrase.length >= 5) {
+        candidates.add(phrase);
+      }
     }
   }
 
@@ -200,7 +258,7 @@ export function searchGidaRadariFromOcrText(
   for (const candidate of candidates) {
     for (const record of records) {
       const score = scoreRecord(candidate, record);
-      if (score < 35) continue;
+      if (score < 30) continue;
 
       const existing = bestMatches.get(record.id);
       if (!existing || score > existing.score) {
