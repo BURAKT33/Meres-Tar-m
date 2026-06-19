@@ -1,3 +1,5 @@
+import { GOOGLE_VISION_API_KEY } from "@/config/vision";
+
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -20,12 +22,11 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 export async function extractTextFromImage(file: File): Promise<string> {
-  const apiKey = import.meta.env.VITE_GOOGLE_VISION_API_KEY;
+  const apiKey =
+    import.meta.env.VITE_GOOGLE_VISION_API_KEY || GOOGLE_VISION_API_KEY;
 
   if (!apiKey) {
-    throw new Error(
-      "Vision API anahtarı tanımlı değil. Vercel veya .env dosyasında VITE_GOOGLE_VISION_API_KEY ayarlayın.",
-    );
+    throw new Error("Vision API anahtarı tanımlı değil.");
   }
 
   const base64 = await fileToBase64(file);
