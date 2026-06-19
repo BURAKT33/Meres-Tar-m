@@ -156,3 +156,60 @@ export function searchGidaRadariRecords(
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
 }
+
+function extractOcrSearchCandidates(ocrText: string): string[] {
+  const candidates = new Set<string>();
+  const trimmed = ocrText.trim();
+
+  if (trimmed.length >= 3) {
+    candidates.add(trimmed);
+  }
+
+  for (const line of ocrText.split("\n")) {
+    const cleanLine = line.replace(/\s+/g, " ").trim();
+    if (cleanLine.length >= 3) {
+      candidates.add(cleanLine);
+    }
+  }
+
+  const words = normalize(ocrText)
+    .split(" ")
+    .filter((word) => word.length >= 3);
+
+  for (const word of words) {
+    candidates.add(word);
+  }
+
+  for (let index = 0; index < words.length; index++) {
+    for (let length = 2; length <= 4 && index + length <= words.length; length++) {
+      candidates.add(words.slice(index, index + length).join(" "));
+    }
+  }
+
+  return [...candidates];
+}
+
+export function searchGidaRadariFromOcrText(
+  ocrText: string,
+  records: GidaRadariRecord[],
+  limit = 8,
+): GidaRadariMatch[] {
+  const candidates = extractOcrSearchCandidates(ocrText);
+  const bestMatches = new Map<string, GidaRadariMatch>();
+
+  for (const candidate of candidates) {
+    for (const record of records) {
+      const score = scoreRecord(candidate, record);
+      if (score < 35) continue;
+
+      const existing = bestMatches.get(record.id);
+      if (!existing || score > existing.score) {
+        bestMatches.set(record.id, { record, score });
+      }
+    }
+  }
+
+  return [...bestMatches.values()]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+}

@@ -5,21 +5,127 @@ import {
   Radar,
   Loader2,
   Building2,
+  Camera,
+  Type,
 } from "lucide-react";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { extractTextFromImage } from "@/lib/googleVision";
 import {
   GidaRadariMatch,
   loadGidaRadariRecords,
+  searchGidaRadariFromOcrText,
   searchGidaRadariRecords,
 } from "@/lib/gidaradariSearch";
 
+type SearchMode = "text" | "camera";
+
+function SearchResultCard({ record, score }: GidaRadariMatch) {
+  return (
+    <div
+      className="rounded-3xl p-6 shadow-lg"
+      style={{
+        backgroundColor: "rgba(255, 140, 66, 0.1)",
+        border: "2px solid var(--accent-warning)",
+      }}
+    >
+      <div className="flex items-start gap-4">
+        <div
+          className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ backgroundColor: "var(--accent-warning)" }}
+        >
+          <AlertTriangle size={24} color="#ffffff" />
+        </div>
+
+        <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <h4
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "1.125rem",
+                fontWeight: 600,
+                color: "var(--text-dark)",
+              }}
+            >
+              {record.company}
+            </h4>
+            <span
+              className="px-2 py-1 rounded-full text-xs"
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.7)",
+                color: "var(--text-gray)",
+                fontFamily: "var(--font-body)",
+              }}
+            >
+              %{score} eşleşme
+            </span>
+          </div>
+
+          <p
+            className="mb-2 flex items-start gap-1"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "0.95rem",
+              color: "var(--text-gray)",
+            }}
+          >
+            <Building2 size={14} className="mt-1 flex-shrink-0" />
+            <span>Ürün: {record.product}</span>
+          </p>
+
+          <p
+            className="mb-2"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "0.95rem",
+              color: "var(--text-gray)",
+            }}
+          >
+            Uygunsuzluk: {record.issue}
+          </p>
+
+          <p
+            className="mb-2"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "0.875rem",
+              color: "var(--text-gray)",
+            }}
+          >
+            {record.productGroup}
+            {record.location ? ` · ${record.location}` : ""}
+            {record.announcementDate ? ` · ${record.announcementDate}` : ""}
+          </p>
+
+          <p
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "0.875rem",
+              color: "var(--text-dark)",
+              lineHeight: 1.6,
+            }}
+          >
+            Kaynak: {record.sourceLabel}
+            <br />
+            (T.C. Tarım ve Orman Bakanlığı resmi kayıtları)
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ProductSearch() {
+  const [mode, setMode] = useState<SearchMode>("text");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GidaRadariMatch[]>([]);
+  const [detectedText, setDetectedText] = useState("");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const selectedFileRef = useRef<File | null>(null);
 
   useEffect(() => {
     loadGidaRadariRecords()
@@ -31,27 +137,92 @@ export function ProductSearch() {
       });
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const resetResults = () => {
+    setResults([]);
+    setDetectedText("");
+    setHasSearched(false);
+    setError(null);
+  };
+
+  const handleModeChange = (nextMode: SearchMode) => {
+    setMode(nextMode);
+    resetResults();
+  };
+
   const handleSearch = async (event?: FormEvent) => {
     event?.preventDefault();
 
     const trimmedQuery = query.trim();
     if (!trimmedQuery) {
-      setResults([]);
-      setHasSearched(false);
+      resetResults();
       return;
     }
 
     setIsSearching(true);
     setError(null);
+    setDetectedText("");
 
     try {
       const records = await loadGidaRadariRecords();
-      const matches = searchGidaRadariRecords(trimmedQuery, records, 5);
+      const matches = searchGidaRadariRecords(trimmedQuery, records, 8);
       setResults(matches);
       setHasSearched(true);
     } catch {
       setError("Arama sırasında bir hata oluştu. Lütfen tekrar deneyin.");
       setResults([]);
+      setHasSearched(true);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    selectedFileRef.current = file;
+    resetResults();
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleCameraSearch = async () => {
+    const file = selectedFileRef.current;
+    if (!file) {
+      setError("Lütfen önce ürün fotoğrafı çekin veya yükleyin.");
+      return;
+    }
+
+    setIsSearching(true);
+    setError(null);
+    setDetectedText("");
+    setResults([]);
+
+    try {
+      const ocrText = await extractTextFromImage(file);
+      const records = await loadGidaRadariRecords();
+      const matches = searchGidaRadariFromOcrText(ocrText, records, 8);
+
+      setDetectedText(ocrText);
+      setResults(matches);
+      setHasSearched(true);
+    } catch (searchError) {
+      const message =
+        searchError instanceof Error
+          ? searchError.message
+          : "Görsel analizi sırasında bir hata oluştu.";
+      setError(message);
       setHasSearched(true);
     } finally {
       setIsSearching(false);
@@ -105,67 +276,181 @@ export function ProductSearch() {
               color: "var(--text-gray)",
             }}
           >
-            <strong style={{ color: "var(--text-dark)" }}>GıdaRadarı</strong> ile T.C. Tarım ve
-            Orman Bakanlığı kayıtlarından anlık sorgulama yapın
+            <strong style={{ color: "var(--text-dark)" }}>GıdaRadarı</strong> ile yazarak veya
+            kamera ile Bakanlık kayıtlarında arama yapın
           </p>
         </motion.div>
 
-        <motion.form
-          onSubmit={handleSearch}
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="relative mb-8"
-        >
-          <div
-            className="flex flex-col sm:flex-row gap-4 p-3 rounded-full shadow-xl"
+        <div className="flex justify-center gap-3 mb-8">
+          <button
+            type="button"
+            onClick={() => handleModeChange("text")}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full transition-all"
             style={{
-              backgroundColor: "#ffffff",
+              backgroundColor: mode === "text" ? "var(--accent-warning)" : "#ffffff",
+              color: mode === "text" ? "#ffffff" : "var(--text-dark)",
               border: "2px solid var(--border-light)",
+              fontFamily: "var(--font-body)",
+              fontWeight: 600,
             }}
           >
-            <div className="flex-1 flex items-center gap-3 px-4">
-              <Search size={24} style={{ color: "var(--text-gray)" }} />
-              <input
-                type="text"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Firma, ürün veya marka adı gir (örnek: Yöre Bal, peynir, sucuk)"
-                className="flex-1 bg-transparent outline-none"
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: "1rem",
-                  color: "var(--text-dark)",
-                }}
-                disabled={isLoadingData}
-              />
-            </div>
+            <Type size={18} />
+            Yazı ile ara
+          </button>
+          <button
+            type="button"
+            onClick={() => handleModeChange("camera")}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full transition-all"
+            style={{
+              backgroundColor: mode === "camera" ? "var(--accent-warning)" : "#ffffff",
+              color: mode === "camera" ? "#ffffff" : "var(--text-dark)",
+              border: "2px solid var(--border-light)",
+              fontFamily: "var(--font-body)",
+              fontWeight: 600,
+            }}
+          >
+            <Camera size={18} />
+            Kamera ile ara
+          </button>
+        </div>
 
-            <motion.button
-              type="submit"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              disabled={isLoadingData || isSearching || !query.trim()}
-              className="px-8 py-3 rounded-full transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        {mode === "text" ? (
+          <motion.form
+            onSubmit={handleSearch}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="relative mb-8"
+          >
+            <div
+              className="flex flex-col sm:flex-row gap-4 p-3 rounded-full shadow-xl"
               style={{
-                backgroundColor: "var(--accent-warning)",
-                color: "#ffffff",
-                fontFamily: "var(--font-body)",
-                fontWeight: 600,
+                backgroundColor: "#ffffff",
+                border: "2px solid var(--border-light)",
               }}
             >
-              {isSearching ? (
-                <>
-                  <Loader2 size={18} className="animate-spin" />
-                  Aranıyor
-                </>
+              <div className="flex-1 flex items-center gap-3 px-4">
+                <Search size={24} style={{ color: "var(--text-gray)" }} />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Firma, ürün veya marka adı gir (örnek: Yöre Bal, peynir, sucuk)"
+                  className="flex-1 bg-transparent outline-none"
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "1rem",
+                    color: "var(--text-dark)",
+                  }}
+                  disabled={isLoadingData}
+                />
+              </div>
+
+              <motion.button
+                type="submit"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                disabled={isLoadingData || isSearching || !query.trim()}
+                className="px-8 py-3 rounded-full transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: "var(--accent-warning)",
+                  color: "#ffffff",
+                  fontFamily: "var(--font-body)",
+                  fontWeight: 600,
+                }}
+              >
+                {isSearching ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    Aranıyor
+                  </>
+                ) : (
+                  "Sorgula"
+                )}
+              </motion.button>
+            </div>
+          </motion.form>
+        ) : (
+          <div className="mb-8 space-y-4">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={handleImageSelect}
+            />
+
+            <div
+              className="rounded-3xl p-6 shadow-xl"
+              style={{
+                backgroundColor: "#ffffff",
+                border: "2px solid var(--border-light)",
+              }}
+            >
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Seçilen ürün fotoğrafı"
+                  className="w-full max-h-80 object-contain rounded-2xl mb-4"
+                />
               ) : (
-                "Sorgula"
+                <div
+                  className="rounded-2xl border-2 border-dashed p-10 text-center mb-4"
+                  style={{ borderColor: "var(--border-light)" }}
+                >
+                  <Camera size={40} className="mx-auto mb-3" style={{ color: "var(--text-gray)" }} />
+                  <p style={{ fontFamily: "var(--font-body)", color: "var(--text-gray)" }}>
+                    Ürün etiketinin fotoğrafını çekin veya galeriden seçin
+                  </p>
+                </div>
               )}
-            </motion.button>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoadingData || isSearching}
+                  className="flex-1 px-6 py-3 rounded-full"
+                  style={{
+                    backgroundColor: "#ffffff",
+                    border: "2px solid var(--border-light)",
+                    fontFamily: "var(--font-body)",
+                    fontWeight: 600,
+                    color: "var(--text-dark)",
+                  }}
+                >
+                  Fotoğraf Çek / Seç
+                </button>
+
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleCameraSearch}
+                  disabled={isLoadingData || isSearching || !previewUrl}
+                  className="flex-1 px-6 py-3 rounded-full disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: "var(--accent-warning)",
+                    color: "#ffffff",
+                    fontFamily: "var(--font-body)",
+                    fontWeight: 600,
+                  }}
+                >
+                  {isSearching ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      Analiz ediliyor
+                    </>
+                  ) : (
+                    "Etiketi Oku ve Ara"
+                  )}
+                </motion.button>
+              </div>
+            </div>
           </div>
-        </motion.form>
+        )}
 
         {error && (
           <div
@@ -178,6 +463,21 @@ export function ProductSearch() {
             }}
           >
             {error}
+          </div>
+        )}
+
+        {detectedText && (
+          <div
+            className="rounded-2xl p-4 mb-6"
+            style={{
+              backgroundColor: "#ffffff",
+              border: "1px solid var(--border-light)",
+              fontFamily: "var(--font-body)",
+              color: "var(--text-gray)",
+            }}
+          >
+            <strong style={{ color: "var(--text-dark)" }}>Okunan yazılar:</strong>
+            <p className="mt-2 whitespace-pre-wrap text-sm">{detectedText}</p>
           </div>
         )}
 
@@ -198,106 +498,20 @@ export function ProductSearch() {
                     color: "var(--text-gray)",
                   }}
                 >
-                  <strong style={{ color: "var(--text-dark)" }}>{results.length}</strong> en yakın
-                  sonuç listelendi
+                  <strong style={{ color: "var(--text-dark)" }}>{results.length}</strong> eşleşen
+                  firma / marka listelendi
                 </p>
 
-                {results.map(({ record, score }, index) => (
-                    <motion.div
-                      key={record.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="rounded-3xl p-6 shadow-lg"
-                      style={{
-                        backgroundColor: "rgba(255, 140, 66, 0.1)",
-                        border: "2px solid var(--accent-warning)",
-                      }}
-                    >
-                      <div className="flex items-start gap-4">
-                        <div
-                          className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: "var(--accent-warning)" }}
-                        >
-                          <AlertTriangle size={24} color="#ffffff" />
-                        </div>
-
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <h4
-                              style={{
-                                fontFamily: "var(--font-body)",
-                                fontSize: "1.125rem",
-                                fontWeight: 600,
-                                color: "var(--text-dark)",
-                              }}
-                            >
-                              {record.company}
-                            </h4>
-                            <span
-                              className="px-2 py-1 rounded-full text-xs"
-                              style={{
-                                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                                color: "var(--text-gray)",
-                                fontFamily: "var(--font-body)",
-                              }}
-                            >
-                              %{score} eşleşme
-                            </span>
-                          </div>
-
-                          <p
-                            className="mb-2 flex items-start gap-1"
-                            style={{
-                              fontFamily: "var(--font-body)",
-                              fontSize: "0.95rem",
-                              color: "var(--text-gray)",
-                            }}
-                          >
-                            <Building2 size={14} className="mt-1 flex-shrink-0" />
-                            <span>Ürün: {record.product}</span>
-                          </p>
-
-                          <p
-                            className="mb-2"
-                            style={{
-                              fontFamily: "var(--font-body)",
-                              fontSize: "0.95rem",
-                              color: "var(--text-gray)",
-                            }}
-                          >
-                            Uygunsuzluk: {record.issue}
-                          </p>
-
-                          <p
-                            className="mb-2"
-                            style={{
-                              fontFamily: "var(--font-body)",
-                              fontSize: "0.875rem",
-                              color: "var(--text-gray)",
-                            }}
-                          >
-                            {record.productGroup}
-                            {record.location ? ` · ${record.location}` : ""}
-                            {record.announcementDate ? ` · ${record.announcementDate}` : ""}
-                          </p>
-
-                          <p
-                            style={{
-                              fontFamily: "var(--font-body)",
-                              fontSize: "0.875rem",
-                              color: "var(--text-dark)",
-                              lineHeight: 1.6,
-                            }}
-                          >
-                            Kaynak: {record.sourceLabel}
-                            <br />
-                            (T.C. Tarım ve Orman Bakanlığı resmi kayıtları)
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                {results.map((match, index) => (
+                  <motion.div
+                    key={match.record.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
+                    <SearchResultCard {...match} />
+                  </motion.div>
+                ))}
               </>
             ) : (
               <div
@@ -314,7 +528,9 @@ export function ProductSearch() {
                     color: "var(--text-gray)",
                   }}
                 >
-                  Aramanıza yakın bir firma veya ürün kaydı bulunamadı. Farklı bir firma veya ürün adı deneyin.
+                  {mode === "camera"
+                    ? "Fotoğraftaki yazılara yakın bir firma veya marka kaydı bulunamadı."
+                    : "Aramanıza yakın bir firma veya ürün kaydı bulunamadı."}
                 </p>
               </div>
             )}
@@ -334,7 +550,9 @@ export function ProductSearch() {
           >
             {isLoadingData
               ? "GıdaRadarı verileri yükleniyor..."
-              : "💡 İpucu: Firma adı, ürün veya marka yazarak Bakanlık kayıtlarında arama yapabilirsiniz"}
+              : mode === "camera"
+                ? "📷 İpucu: Ürün etiketini net çekin; Cloud Vision yazıları okuyup kayıtlarda arayacaktır"
+                : "💡 İpucu: Firma adı, ürün veya marka yazarak Bakanlık kayıtlarında arama yapabilirsiniz"}
           </motion.p>
         )}
       </div>
