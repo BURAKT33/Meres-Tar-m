@@ -7,9 +7,11 @@ import {
   Building2,
   Camera,
   Type,
+  CheckCircle2,
 } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { extractTextFromImage } from "@/lib/googleVision";
+import { yieldToMain } from "@/lib/asyncUtils";
 import {
   GidaRadariMatch,
   loadGidaRadariRecords,
@@ -18,6 +20,7 @@ import {
 } from "@/lib/gidaradariSearch";
 
 type SearchMode = "text" | "camera";
+type SearchStep = "idle" | "processing" | "reading" | "searching";
 
 function SearchResultCard({ record, score }: GidaRadariMatch) {
   return (
@@ -119,6 +122,9 @@ export function ProductSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GidaRadariMatch[]>([]);
   const [detectedText, setDetectedText] = useState("");
+  const [detectedBrands, setDetectedBrands] = useState<string[]>([]);
+  const [isCleanResult, setIsCleanResult] = useState(false);
+  const [searchStep, setSearchStep] = useState<SearchStep>("idle");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -148,6 +154,9 @@ export function ProductSearch() {
   const resetResults = () => {
     setResults([]);
     setDetectedText("");
+    setDetectedBrands([]);
+    setIsCleanResult(false);
+    setSearchStep("idle");
     setHasSearched(false);
     setError(null);
   };
@@ -209,17 +218,29 @@ export function ProductSearch() {
     }
 
     setIsSearching(true);
+    setSearchStep("processing");
     setError(null);
     setDetectedText("");
+    setDetectedBrands([]);
+    setIsCleanResult(false);
     setResults([]);
+    setHasSearched(false);
 
     try {
+      await yieldToMain();
+      setSearchStep("reading");
       const ocrText = await extractTextFromImage(file);
+
+      setSearchStep("searching");
+      await yieldToMain();
+
       const records = await loadGidaRadariRecords();
-      const matches = searchGidaRadariFromOcrText(ocrText, records, 8);
+      const searchResult = searchGidaRadariFromOcrText(ocrText, records, 8);
 
       setDetectedText(ocrText);
-      setResults(matches);
+      setDetectedBrands(searchResult.brands);
+      setIsCleanResult(searchResult.isClean);
+      setResults(searchResult.matches);
       setHasSearched(true);
     } catch (searchError) {
       const message =
@@ -230,8 +251,18 @@ export function ProductSearch() {
       setHasSearched(true);
     } finally {
       setIsSearching(false);
+      setSearchStep("idle");
     }
   };
+
+  const searchStepLabel =
+    searchStep === "processing"
+      ? "Fotoğraf işleniyor..."
+      : searchStep === "reading"
+        ? "Etiket okunuyor..."
+        : searchStep === "searching"
+          ? "Kayıtlar aranıyor..."
+          : "Analiz ediliyor";
 
   return (
     <section className="py-20 lg:py-28" style={{ backgroundColor: "var(--background-cream)" }}>
@@ -445,7 +476,7 @@ export function ProductSearch() {
                   {isSearching ? (
                     <>
                       <Loader2 size={18} className="animate-spin" />
-                      Analiz ediliyor
+                      {searchStepLabel}
                     </>
                   ) : (
                     "Etiketi Oku ve Ara"
@@ -480,6 +511,12 @@ export function ProductSearch() {
               color: "var(--text-gray)",
             }}
           >
+            {detectedBrands.length > 0 && (
+              <p className="mb-2">
+                <strong style={{ color: "var(--text-dark)" }}>Algılanan marka:</strong>{" "}
+                {detectedBrands.join(" · ")}
+              </p>
+            )}
             <strong style={{ color: "var(--text-dark)" }}>Okunan yazılar:</strong>
             <p className="mt-2 whitespace-pre-wrap text-sm">{detectedText}</p>
           </div>
@@ -492,7 +529,48 @@ export function ProductSearch() {
             transition={{ duration: 0.35 }}
             className="space-y-4"
           >
-            {results.length > 0 ? (
+            {isCleanResult ? (
+              <div
+                className="rounded-3xl p-6 shadow-lg"
+                style={{
+                  backgroundColor: "rgba(45, 106, 79, 0.08)",
+                  border: "2px solid var(--primary-green-light)",
+                }}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: "var(--primary-green-dark)" }}
+                  >
+                    <CheckCircle2 size={24} color="#ffffff" />
+                  </div>
+                  <div>
+                    <h4
+                      className="mb-2"
+                      style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: "1.125rem",
+                        fontWeight: 600,
+                        color: "var(--text-dark)",
+                      }}
+                    >
+                      Kayıt bulunamadı
+                    </h4>
+                    <p
+                      style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: "1rem",
+                        color: "var(--text-gray)",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      <strong>{detectedBrands[0] ?? "Bu marka"}</strong> için Bakanlık
+                      kayıtlarında uygunsuzluk tespiti bulunamadı.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : results.length > 0 ? (
               <>
                 <p
                   className="text-center"

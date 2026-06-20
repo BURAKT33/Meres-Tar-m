@@ -16,9 +16,73 @@ export type GidaRadariMatch = {
   score: number;
 };
 
+export type OcrSearchResult = {
+  brands: string[];
+  matches: GidaRadariMatch[];
+  isClean: boolean;
+};
+
+type IndexedRecord = {
+  record: GidaRadariRecord;
+  companyNorm: string;
+  productNorm: string;
+  combinedNorm: string;
+};
+
 const DATA_URL = "/data/records.json";
 
 let cachedRecords: GidaRadariRecord[] | null = null;
+let indexedRecords: IndexedRecord[] | null = null;
+
+const OCR_STOP_WORDS = new Set([
+  "sut",
+  "gida",
+  "urun",
+  "urunleri",
+  "urunler",
+  "marka",
+  "tic",
+  "san",
+  "ltd",
+  "sti",
+  "anonim",
+  "sirketi",
+  "ve",
+  "icin",
+  "ile",
+  "gr",
+  "gram",
+  "ml",
+  "kg",
+  "adet",
+  "tam",
+  "yagli",
+  "yag",
+  "taze",
+  "islem",
+  "gormus",
+  "isil",
+  "net",
+  "icerik",
+  "miktari",
+  "skt",
+  "tet",
+  "tett",
+  "parti",
+  "seri",
+  "no",
+  "the",
+  "and",
+  "devlet",
+  "pancar",
+  "seker",
+  "tarim",
+  "sozlesmel",
+  "sozlesmeli",
+  "kristal",
+  "uretilmistir",
+  "kurulusudur",
+]);
 
 function normalize(text: string): string {
   return text
@@ -126,6 +190,117 @@ function scoreRecord(query: string, record: GidaRadariRecord): number {
   return Math.round(bestScore);
 }
 
+function scoreIndexedRecordFast(query: string, indexed: IndexedRecord): number {
+  const normalizedQuery = normalize(query);
+  if (!normalizedQuery || normalizedQuery.length < 3) return 0;
+
+  const fields = [
+    { value: indexed.companyNorm, weight: 1.2 },
+    { value: indexed.productNorm, weight: 1 },
+    { value: indexed.combinedNorm, weight: 1.05 },
+  ];
+
+  let bestScore = 0;
+
+  for (const field of fields) {
+    if (!field.value) continue;
+
+    if (field.value === normalizedQuery) {
+      bestScore = Math.max(bestScore, 100 * field.weight);
+      continue;
+    }
+
+    if (field.value.startsWith(normalizedQuery)) {
+      bestScore = Math.max(bestScore, 92 * field.weight);
+    }
+
+    if (field.value.includes(normalizedQuery)) {
+      bestScore = Math.max(bestScore, 78 * field.weight);
+    }
+
+    if (normalizedQuery.length >= 5) {
+      const queryTokens = normalizedQuery.split(" ").filter(Boolean);
+      const targetTokens = field.value.split(" ").filter(Boolean);
+      const overlap = queryTokens.filter((token) =>
+        targetTokens.some(
+          (targetToken) =>
+            targetToken.includes(token) || token.includes(targetToken),
+        ),
+      ).length;
+
+      if (overlap === queryTokens.length && queryTokens.length > 0) {
+        bestScore = Math.max(bestScore, 70 * field.weight);
+      }
+    }
+  }
+
+  return Math.round(bestScore);
+}
+
+function buildIndexedRecords(records: GidaRadariRecord[]): IndexedRecord[] {
+  return records.map((record) => ({
+    record,
+    companyNorm: normalize(record.company),
+    productNorm: normalize(record.product),
+    combinedNorm: normalize(`${record.company} ${record.product}`),
+  }));
+}
+
+function getIndexedRecords(records: GidaRadariRecord[]): IndexedRecord[] {
+  if (!indexedRecords || indexedRecords.length !== records.length) {
+    indexedRecords = buildIndexedRecords(records);
+  }
+  return indexedRecords;
+}
+
+function isUsefulOcrToken(token: string): boolean {
+  if (token.length < 4) return false;
+  if (OCR_STOP_WORDS.has(token)) return false;
+  if (/^\d+$/.test(token)) return false;
+  return true;
+}
+
+function extractBrandCandidates(ocrText: string): string[] {
+  const candidates: string[] = [];
+  const seen = new Set<string>();
+
+  const addCandidate = (value: string) => {
+    const cleaned = value.replace(/["']/g, " ").replace(/\s+/g, " ").trim();
+    const key = normalize(cleaned);
+    if (cleaned.length < 3 || seen.has(key)) return;
+    seen.add(key);
+    candidates.push(cleaned);
+  };
+
+  const lines = ocrText
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  for (const line of lines.slice(0, 5)) {
+    if (line.length <= 45 && !/^\d/.test(line)) {
+      addCandidate(line);
+    }
+
+    for (const part of line.split("/").map((item) => item.trim())) {
+      if (part.length >= 4 && part.length <= 40) {
+        addCandidate(part);
+      }
+    }
+  }
+
+  const meaningfulLines = lines.filter((line) => line.length >= 4 && line.length <= 24);
+  if (meaningfulLines.length >= 2) {
+    addCandidate(meaningfulLines.slice(0, 2).join(" "));
+  }
+
+  for (const word of normalize(ocrText).split(" ").filter(isUsefulOcrToken)) {
+    addCandidate(word);
+  }
+
+  return candidates.slice(0, 8);
+}
+
 export async function loadGidaRadariRecords(): Promise<GidaRadariRecord[]> {
   if (cachedRecords) return cachedRecords;
 
@@ -136,6 +311,7 @@ export async function loadGidaRadariRecords(): Promise<GidaRadariRecord[]> {
 
   const data = (await response.json()) as GidaRadariRecord[];
   cachedRecords = data;
+  indexedRecords = null;
   return data;
 }
 
@@ -157,117 +333,78 @@ export function searchGidaRadariRecords(
     .slice(0, limit);
 }
 
-const OCR_STOP_WORDS = new Set([
-  "sut",
-  "gida",
-  "urun",
-  "urunleri",
-  "urunler",
-  "marka",
-  "tic",
-  "san",
-  "ltd",
-  "sti",
-  "anonim",
-  "sirketi",
-  "ve",
-  "icin",
-  "ile",
-  "gr",
-  "gram",
-  "ml",
-  "kg",
-  "adet",
-  "tam",
-  "yagli",
-  "yag",
-  "taze",
-  "islem",
-  "gormus",
-  "isil",
-  "net",
-  "icerik",
-  "miktari",
-  "skt",
-  "tet",
-  "tett",
-  "parti",
-  "seri",
-  "no",
-  "the",
-  "and",
-]);
-
-function isUsefulOcrToken(token: string): boolean {
-  if (token.length < 3) return false;
-  if (OCR_STOP_WORDS.has(token)) return false;
-  if (/^\d+$/.test(token)) return false;
-  return true;
-}
-
-function extractOcrSearchCandidates(ocrText: string): string[] {
-  const candidates = new Set<string>();
-  const trimmed = ocrText.trim();
-
-  if (trimmed.length >= 3) {
-    candidates.add(trimmed);
-  }
-
-  for (const line of ocrText.split("\n")) {
-    const cleanLine = line.replace(/\s+/g, " ").trim();
-    if (cleanLine.length >= 3) {
-      candidates.add(cleanLine);
-    }
-
-    const slashParts = cleanLine.split("/").map((part) => part.trim());
-    for (const part of slashParts) {
-      if (part.length >= 3) {
-        candidates.add(part);
-      }
-    }
-  }
-
-  const words = normalize(ocrText)
-    .split(" ")
-    .filter(isUsefulOcrToken);
-
-  for (const word of words) {
-    candidates.add(word);
-  }
-
-  for (let index = 0; index < words.length; index++) {
-    for (let length = 2; length <= 4 && index + length <= words.length; length++) {
-      const phrase = words.slice(index, index + length).join(" ");
-      if (phrase.length >= 5) {
-        candidates.add(phrase);
-      }
-    }
-  }
-
-  return [...candidates];
-}
-
 export function searchGidaRadariFromOcrText(
   ocrText: string,
   records: GidaRadariRecord[],
   limit = 8,
-): GidaRadariMatch[] {
-  const candidates = extractOcrSearchCandidates(ocrText);
+): OcrSearchResult {
+  const indexed = getIndexedRecords(records);
+  const candidates = extractBrandCandidates(ocrText);
+  const brands = candidates.slice(0, 3);
+  const primaryBrand = brands[0] ?? "";
+  const brandNorm = normalize(primaryBrand);
+
+  if (brandNorm.length >= 4) {
+    const brandPool = indexed.filter(
+      (item) =>
+        item.companyNorm.includes(brandNorm) ||
+        item.productNorm.includes(brandNorm) ||
+        item.combinedNorm.includes(brandNorm),
+    );
+
+    if (brandPool.length === 0) {
+      return {
+        brands,
+        matches: [],
+        isClean: true,
+      };
+    }
+
+    const bestMatches = new Map<string, GidaRadariMatch>();
+
+    for (const candidate of candidates) {
+      for (const item of brandPool) {
+        const score = scoreIndexedRecordFast(candidate, item);
+        if (score < 60) continue;
+
+        const existing = bestMatches.get(item.record.id);
+        if (!existing || score > existing.score) {
+          bestMatches.set(item.record.id, { record: item.record, score });
+        }
+      }
+    }
+
+    return {
+      brands,
+      matches: [...bestMatches.values()]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit),
+      isClean: false,
+    };
+  }
+
   const bestMatches = new Map<string, GidaRadariMatch>();
 
   for (const candidate of candidates) {
-    for (const record of records) {
-      const score = scoreRecord(candidate, record);
-      if (score < 30) continue;
+    const normalizedCandidate = normalize(candidate);
+    if (normalizedCandidate.length < 4) continue;
 
-      const existing = bestMatches.get(record.id);
+    for (const item of indexed) {
+      const score = scoreIndexedRecordFast(candidate, item);
+      if (score < 70) continue;
+
+      const existing = bestMatches.get(item.record.id);
       if (!existing || score > existing.score) {
-        bestMatches.set(record.id, { record, score });
+        bestMatches.set(item.record.id, { record: item.record, score });
       }
     }
   }
 
-  return [...bestMatches.values()]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit);
+  return {
+    brands,
+    matches: [...bestMatches.values()]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit),
+    isClean: false,
+  };
 }

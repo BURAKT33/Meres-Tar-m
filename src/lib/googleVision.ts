@@ -1,7 +1,8 @@
 import { GOOGLE_VISION_API_KEY } from "@/config/vision";
+import { yieldToMain } from "@/lib/asyncUtils";
 
-const MAX_IMAGE_DIMENSION = 1600;
-const JPEG_QUALITY = 0.85;
+const MAX_IMAGE_DIMENSION = 1200;
+const JPEG_QUALITY = 0.82;
 
 function isHeicFile(file: File): boolean {
   const name = file.name.toLowerCase();
@@ -87,6 +88,7 @@ export async function extractTextFromImage(file: File): Promise<string> {
   }
 
   const base64 = await prepareImageBase64(file);
+  await yieldToMain();
 
   let response: Response;
   try {
