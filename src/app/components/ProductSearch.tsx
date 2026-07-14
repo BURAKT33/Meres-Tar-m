@@ -302,17 +302,20 @@ export function ProductSearch() {
               color: "var(--text-dark)",
             }}
           >
-            Bu ürün daha önce hile yapmış mı?
+            Bakanlık kayıtlarında sorgula
           </h2>
           <p
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "1.125rem",
               color: "var(--text-gray)",
+              maxWidth: "36rem",
+              margin: "0 auto",
+              lineHeight: 1.6,
             }}
           >
-            <strong style={{ color: "var(--text-dark)" }}>GıdaRadarı</strong> ile yazarak veya
-            kamera ile Bakanlık kayıtlarında arama yapın
+            Yazarak veya kamera ile firma, ürün ya da marka arayın. Veriler T.C. Tarım ve
+            Orman Bakanlığı&apos;nın yayımladığı kayıtlardan alınır.
           </p>
         </motion.div>
 
@@ -631,10 +634,10 @@ export function ProductSearch() {
             }}
           >
             {isLoadingData
-              ? "GıdaRadarı verileri yükleniyor..."
+              ? "Kayıtlar yükleniyor..."
               : mode === "camera"
-                ? "📷 İpucu: Ürün etiketini net çekin; Cloud Vision yazıları okuyup kayıtlarda arayacaktır"
-                : "💡 İpucu: Firma adı, ürün veya marka yazarak Bakanlık kayıtlarında arama yapabilirsiniz"}
+                ? "Ürün etiketini net çekin; yazılar okunup Bakanlık kayıtlarında aranır."
+                : "Firma, ürün veya marka adı ile Bakanlık kayıtlarında arama yapabilirsiniz."}
           </motion.p>
         )}
       </div>

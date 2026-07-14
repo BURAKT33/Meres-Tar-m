@@ -8,14 +8,14 @@ const footerLinks = {
     { icon: MapPin, text: "Ankara, Türkiye" },
   ],
   hakkimizda: [
-    { text: "Hakkımızda", href: "#about" },
-    { text: "Vizyonumuz", href: "#vision" },
-    { text: "Misyonumuz", href: "#vision" },
+    { text: "Hakkımızda", href: "/#about" },
+    { text: "Vizyonumuz", href: "/#vision" },
+    { text: "Misyonumuz", href: "/#vision" },
   ],
   urunler: [
-    { text: "Tohumlar", href: "#products" },
-    { text: "Fideler", href: "#products" },
-    { text: "Gübreler", href: "#products" },
+    { text: "Tohumlar", href: "/#products" },
+    { text: "Fideler", href: "/#products" },
+    { text: "Gübreler", href: "/#products" },
   ],
   gizlilik: [
     { text: "Gizlilik Politikası", href: "#" },

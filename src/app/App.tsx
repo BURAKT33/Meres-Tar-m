@@ -1,29 +1,15 @@
-import { Header } from "./components/Header";
-import { Hero } from "./components/Hero";
-import { ServiceCards } from "./components/ServiceCards";
-import { Products } from "./components/Products";
-import { About } from "./components/About";
-import { VisionMission } from "./components/VisionMission";
-import { ProductSearch } from "./components/ProductSearch";
-import { SocialProof } from "./components/SocialProof";
-import { Contact } from "./components/Contact";
-import { Footer } from "./components/Footer";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import HomePage from "./pages/HomePage";
+import GidaRadariPage from "./pages/GidaRadariPage";
 
 export default function App() {
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main>
-        <Hero />
-        <ServiceCards />
-        <Products />
-        <About />
-        <VisionMission />
-        <ProductSearch />
-        <SocialProof />
-        <Contact />
-      </main>
-      <Footer />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/gida-radari" element={<GidaRadariPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
