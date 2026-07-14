@@ -5,7 +5,7 @@ const contactInfo = [
   {
     icon: Phone,
     title: "Telefon",
-    info: "+90 (312) 555 0123",
+    info: "+90 506 707 19 78",
     subInfo: "Hafta içi 08:00 - 18:00",
   },
   {
@@ -17,8 +17,8 @@ const contactInfo = [
   {
     icon: MapPin,
     title: "Adres",
-    info: "Atatürk Bulvarı No:123",
-    subInfo: "Çankaya, Ankara",
+    info: "Eskişehir, Türkiye",
+    subInfo: "",
   },
   {
     icon: Clock,
@@ -104,15 +104,17 @@ export function Contact() {
                 {item.info}
               </p>
 
-              <p
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '0.875rem',
-                  color: 'var(--text-gray)',
-                }}
-              >
-                {item.subInfo}
-              </p>
+              {item.subInfo ? (
+                <p
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '0.875rem',
+                    color: 'var(--text-gray)',
+                  }}
+                >
+                  {item.subInfo}
+                </p>
+              ) : null}
             </motion.div>
           ))}
         </div>

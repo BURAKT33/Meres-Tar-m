@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
-import { Sprout, Trees, Droplet } from "lucide-react";
+import { Sprout, Trees, Droplet, Radar, ArrowRight } from "lucide-react";
+import { Link } from "react-router";
 
 const products = [
   {
@@ -146,6 +147,70 @@ export function Products() {
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="mt-12 rounded-3xl p-8 lg:p-10"
+          style={{
+            backgroundColor: 'var(--background-cream)',
+            border: '1px solid var(--border-light)',
+          }}
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-10">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: 'rgba(255, 140, 66, 0.12)' }}
+            >
+              <Radar size={28} style={{ color: 'var(--accent-warning)' }} />
+            </div>
+
+            <div className="flex-1">
+              <h3
+                className="mb-2"
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  color: 'var(--text-dark)',
+                }}
+              >
+                GıdaRadarı
+              </h3>
+              <p
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '1rem',
+                  color: 'var(--text-gray)',
+                  lineHeight: 1.6,
+                  maxWidth: '40rem',
+                }}
+              >
+                Firma, ürün veya marka adını yazarak ya da etiket fotoğrafıyla T.C. Tarım ve
+                Orman Bakanlığı&apos;nın yayımladığı uygunsuzluk kayıtlarında arama yapabilirsiniz.
+              </p>
+            </div>
+
+            <Link to="/gida-radari" className="flex-shrink-0">
+              <motion.span
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full"
+                style={{
+                  backgroundColor: 'var(--accent-warning)',
+                  color: '#ffffff',
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 600,
+                }}
+              >
+                GıdaRadarı&apos;na git
+                <ArrowRight size={18} />
+              </motion.span>
+            </Link>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

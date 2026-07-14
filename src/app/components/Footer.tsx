@@ -4,8 +4,8 @@ import { Mail, Phone, MapPin, Award } from "lucide-react";
 const footerLinks = {
   iletisim: [
     { icon: Mail, text: "info@merestohum.com.tr" },
-    { icon: Phone, text: "+90 (312) 555 0123" },
-    { icon: MapPin, text: "Ankara, Türkiye" },
+    { icon: Phone, text: "+90 506 707 19 78" },
+    { icon: MapPin, text: "Eskişehir, Türkiye" },
   ],
   hakkimizda: [
     { text: "Hakkımızda", href: "/#about" },
