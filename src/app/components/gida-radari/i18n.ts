@@ -59,6 +59,18 @@ export const gidaRadariCopy = {
       description:
         "Uygulamamız gücünü şahsi yorumlardan değil, devletin resmi kurumlarından alır. T.C. Tarım ve Orman Bakanlığı'nın laboratuvar testleriyle kanıtlanmış verilerini cebinize taşırız. Markalardan yönlendirme ücreti almayız, tarafımız her zaman sizin sağlığınızdır.",
     },
+    appPreview: {
+      eyebrow: "Cebinizdeki gıda rehberi",
+      title: "Her taramada net bir sonuç",
+      description:
+        "Ürünlerinizi saniyeler içinde tarayın, sonucu anlayın ve önceki sorgularınızı tek bir yerde takip edin.",
+      captions: ["Riskli ürün uyarısı", "Tarama geçmişiniz", "Güvenli ürün sonucu"],
+      imageAlt: [
+        "Riskli ürün sonucu gösteren Gıda Radarı uygulama ekranı",
+        "Önceki taramaları gösteren Gıda Radarı uygulama ekranı",
+        "Güvenli ürün sonucu gösteren Gıda Radarı uygulama ekranı",
+      ],
+    },
     search: {
       title: "Web'den de sorgulayın",
       description:
@@ -147,6 +159,18 @@ export const gidaRadariCopy = {
       description:
         "Our app is powered by official public institutions, not personal opinions. We put the Turkish Ministry of Agriculture and Forestry's laboratory-confirmed records in your pocket. We never accept referral fees from brands; your health always comes first.",
     },
+    appPreview: {
+      eyebrow: "Your pocket food guide",
+      title: "A clear result with every scan",
+      description:
+        "Scan products in seconds, understand the result and keep all of your previous searches in one place.",
+      captions: ["Risky product alert", "Your scan history", "Safe product result"],
+      imageAlt: [
+        "Gıda Radarı app screen showing a risky product result",
+        "Gıda Radarı app screen showing previous scans",
+        "Gıda Radarı app screen showing a safe product result",
+      ],
+    },
     search: {
       title: "Search on the Web Too",
       description:
@@ -233,6 +257,18 @@ export const gidaRadariCopy = {
       title: "بيانات حقيقية، نتائج واضحة",
       description:
         "يعتمد تطبيقنا على المؤسسات الرسمية لا الآراء الشخصية. نضع في جيبك السجلات المثبتة مخبرياً لوزارة الزراعة والغابات التركية. لا نتلقى رسوم إحالة من العلامات التجارية؛ صحتك هي أولويتنا دائماً.",
+    },
+    appPreview: {
+      eyebrow: "دليلك الغذائي في جيبك",
+      title: "نتيجة واضحة مع كل عملية مسح",
+      description:
+        "امسح المنتجات خلال ثوانٍ، وافهم النتيجة، واحتفظ بكل عمليات البحث السابقة في مكان واحد.",
+      captions: ["تنبيه منتج خطر", "سجل عمليات المسح", "نتيجة منتج آمن"],
+      imageAlt: [
+        "شاشة تطبيق رادار الغذاء تعرض نتيجة منتج خطر",
+        "شاشة تطبيق رادار الغذاء تعرض عمليات المسح السابقة",
+        "شاشة تطبيق رادار الغذاء تعرض نتيجة منتج آمن",
+      ],
     },
     search: {
       title: "ابحث عبر الويب أيضاً",
