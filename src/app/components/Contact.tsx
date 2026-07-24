@@ -1,34 +1,30 @@
 import { motion } from "motion/react";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { GidaRadariLanguage } from "./gida-radari/i18n";
+import { homeCopy } from "./home-i18n";
 
 const contactInfo = [
   {
     icon: Phone,
-    title: "Telefon",
     info: "+90 506 707 19 78",
-    subInfo: "Hafta içi 08:00 - 18:00",
   },
   {
     icon: Mail,
-    title: "E-posta",
     info: "info@merestohum.com.tr",
-    subInfo: "24 saat içinde yanıt veriyoruz",
   },
   {
     icon: MapPin,
-    title: "Adres",
     info: "Eskişehir, Türkiye",
-    subInfo: "",
   },
   {
     icon: Clock,
-    title: "Çalışma Saatleri",
     info: "Pazartesi - Cuma: 08:00 - 18:00",
-    subInfo: "Cumartesi: 09:00 - 14:00",
   },
 ];
 
-export function Contact() {
+export function Contact({ language }: { language: GidaRadariLanguage }) {
+  const copy = homeCopy[language].contact;
+
   return (
     <section id="contact" className="py-20 lg:py-28" style={{ backgroundColor: 'var(--background-soft-green)' }}>
       <div className="max-w-6xl mx-auto px-6 lg:px-12">
@@ -48,7 +44,7 @@ export function Contact() {
               color: 'var(--text-dark)',
             }}
           >
-            İletişim
+            {copy.title}
           </h2>
           <p
             style={{
@@ -57,14 +53,17 @@ export function Contact() {
               color: 'var(--text-gray)',
             }}
           >
-            Sorularınız için bize ulaşın
+            {copy.description}
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {contactInfo.map((item, index) => (
+          {contactInfo.map((item, index) => {
+            const contact = copy.info[index];
+            const info = "info" in contact ? contact.info : item.info;
+            return (
             <motion.div
-              key={item.title}
+              key={contact.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -89,7 +88,7 @@ export function Contact() {
                   color: 'var(--text-dark)',
                 }}
               >
-                {item.title}
+                {contact.title}
               </h3>
 
               <p
@@ -101,10 +100,10 @@ export function Contact() {
                   fontWeight: 500,
                 }}
               >
-                {item.info}
+                {info}
               </p>
 
-              {item.subInfo ? (
+              {contact.subInfo ? (
                 <p
                   style={{
                     fontFamily: 'var(--font-body)',
@@ -112,11 +111,12 @@ export function Contact() {
                     color: 'var(--text-gray)',
                   }}
                 >
-                  {item.subInfo}
+                  {contact.subInfo}
                 </p>
               ) : null}
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         <motion.div
@@ -136,7 +136,7 @@ export function Contact() {
               color: 'var(--text-dark)',
             }}
           >
-            Bize Mesaj Gönderin
+            {copy.formTitle}
           </h3>
 
           <form className="grid md:grid-cols-2 gap-6">
@@ -150,11 +150,11 @@ export function Contact() {
                   color: 'var(--text-dark)',
                 }}
               >
-                Ad Soyad
+                {copy.fullName}
               </label>
               <input
                 type="text"
-                placeholder="Adınız ve soyadınız"
+                placeholder={copy.fullNamePlaceholder}
                 className="w-full px-4 py-3 rounded-2xl outline-none transition-all focus:ring-2"
                 style={{
                   backgroundColor: '#ffffff',
@@ -175,7 +175,7 @@ export function Contact() {
                   color: 'var(--text-dark)',
                 }}
               >
-                E-posta
+                {copy.email}
               </label>
               <input
                 type="email"
@@ -200,11 +200,11 @@ export function Contact() {
                   color: 'var(--text-dark)',
                 }}
               >
-                Mesajınız
+                {copy.message}
               </label>
               <textarea
                 rows={5}
-                placeholder="Mesajınızı buraya yazın..."
+                placeholder={copy.messagePlaceholder}
                 className="w-full px-4 py-3 rounded-2xl outline-none transition-all focus:ring-2 resize-none"
                 style={{
                   backgroundColor: '#ffffff',
@@ -229,7 +229,7 @@ export function Contact() {
                   fontSize: '1.125rem',
                 }}
               >
-                Mesaj Gönder
+                {copy.submit}
               </motion.button>
             </div>
           </form>

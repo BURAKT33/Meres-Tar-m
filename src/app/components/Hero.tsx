@@ -1,6 +1,10 @@
 import { motion } from "motion/react";
+import { GidaRadariLanguage } from "./gida-radari/i18n";
+import { homeCopy } from "./home-i18n";
 
-export function Hero() {
+export function Hero({ language }: { language: GidaRadariLanguage }) {
+  const copy = homeCopy[language].hero;
+
   return (
     <section className="relative min-h-[90vh] lg:min-h-[85vh] flex items-center overflow-hidden" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, transparent 100%), var(--background-cream)' }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 items-center w-full">
@@ -12,7 +16,7 @@ export function Hero() {
           className="space-y-8 text-center lg:text-left"
         >
           <h1
-            className="leading-tight"
+            className="leading-tight whitespace-pre-line"
             style={{
               fontFamily: 'var(--font-heading)',
               fontSize: 'clamp(2.25rem, 5vw, 3.5rem)',
@@ -20,7 +24,7 @@ export function Hero() {
               color: 'var(--text-dark)',
             }}
           >
-            Toprağın gücü,<br />sofraların güvencesi
+            {copy.title}
           </h1>
 
           <p
@@ -32,7 +36,7 @@ export function Hero() {
               lineHeight: 1.7,
             }}
           >
-            Kaliteli tohum, fide ve gübre çözümleri. Bakanlık onaylı ürünlerle tarımda güvenilir ortak.
+            {copy.description}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -49,7 +53,7 @@ export function Hero() {
                 textDecoration: 'none',
               }}
             >
-              Ürünlerimizi Keşfet
+              {copy.products}
             </motion.a>
 
             <motion.a
@@ -65,7 +69,7 @@ export function Hero() {
                 textDecoration: 'none',
               }}
             >
-              Hakkımızda
+              {copy.about}
             </motion.a>
           </div>
         </motion.div>
@@ -79,7 +83,7 @@ export function Hero() {
         >
           <img
             src="https://images.unsplash.com/photo-1560493676-04071c5f467b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-            alt="Tarım alanları havadan görünüm"
+            alt={copy.imageAlt}
             className="w-full h-full object-cover"
           />
         </motion.div>

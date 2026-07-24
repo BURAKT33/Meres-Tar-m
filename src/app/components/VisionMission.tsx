@@ -1,7 +1,11 @@
 import { motion } from "motion/react";
 import { Eye, Compass } from "lucide-react";
+import { GidaRadariLanguage } from "./gida-radari/i18n";
+import { homeCopy } from "./home-i18n";
 
-export function VisionMission() {
+export function VisionMission({ language }: { language: GidaRadariLanguage }) {
+  const copy = homeCopy[language].vision;
+
   return (
     <section id="vision" className="py-20 lg:py-28" style={{ backgroundColor: 'var(--background-cream)' }}>
       <div className="max-w-6xl mx-auto px-6 lg:px-12">
@@ -21,7 +25,7 @@ export function VisionMission() {
               color: 'var(--text-dark)',
             }}
           >
-            Vizyon & Misyon
+            {copy.title}
           </h2>
         </motion.div>
 
@@ -54,7 +58,7 @@ export function VisionMission() {
                 color: 'var(--text-dark)',
               }}
             >
-              Vizyonumuz
+              {copy.visionTitle}
             </h3>
 
             <p
@@ -66,15 +70,11 @@ export function VisionMission() {
                 lineHeight: 1.8,
               }}
             >
-              Türkiye'nin en güvenilir tarımsal girdi tedarikçisi olarak, sürdürülebilir tarım uygulamalarını yaygınlaştırmak ve gelecek nesillere verimli topraklar bırakmak.
+              {copy.visionDescription}
             </p>
 
             <div className="space-y-3">
-              {[
-                "Organik tarımda lider marka",
-                "Yenilikçi tohum teknolojileri",
-                "Çevre dostu üretim süreçleri",
-              ].map((item, idx) => (
+              {copy.visionItems.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-3">
                   <div
                     className="w-2 h-2 rounded-full"
@@ -123,7 +123,7 @@ export function VisionMission() {
                 color: 'var(--text-dark)',
               }}
             >
-              Misyonumuz
+              {copy.missionTitle}
             </h3>
 
             <p
@@ -135,15 +135,11 @@ export function VisionMission() {
                 lineHeight: 1.8,
               }}
             >
-              Çiftçilerimize en kaliteli tohum, fide ve gübre ürünlerini sunarak tarımsal verimliliği artırmak, gıda güvenliğini sağlamak ve kırsal kalkınmaya katkıda bulunmak.
+              {copy.missionDescription}
             </p>
 
             <div className="space-y-3">
-              {[
-                "Kalite kontrollü ürün garantisi",
-                "Uygun fiyatlarla erişilebilirlik",
-                "Teknik destek ve danışmanlık",
-              ].map((item, idx) => (
+              {copy.missionItems.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-3">
                   <div
                     className="w-2 h-2 rounded-full"

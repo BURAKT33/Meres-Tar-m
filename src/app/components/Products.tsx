@@ -1,47 +1,30 @@
 import { motion } from "motion/react";
 import { Sprout, Trees, Droplet, Radar, ArrowRight } from "lucide-react";
 import { Link } from "react-router";
+import { GidaRadariLanguage } from "./gida-radari/i18n";
+import { homeCopy } from "./home-i18n";
 
-const products = [
+const productMeta = [
   {
     icon: Sprout,
-    category: "Tohumlar",
-    items: [
-      "Sebze tohumları (domates, biber, patlıcan)",
-      "Tahıl tohumları (buğday, arpa, mısır)",
-      "Organik ve hibrit çeşitler",
-      "Yerel tohum koleksiyonu"
-    ],
     image: "https://images.unsplash.com/photo-1657288089316-c0350003ca49?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     color: "var(--primary-green-dark)",
   },
   {
     icon: Trees,
-    category: "Fideler",
-    items: [
-      "Meyve fidanları (elma, armut, şeftali)",
-      "Sebze fideleri (domates, biber, salatalık)",
-      "Süs bitkileri fidesi",
-      "Aşılı ve sertifikalı fideler"
-    ],
     image: "https://images.unsplash.com/photo-1576181456177-2b99ac0aa1ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     color: "var(--primary-green-light)",
   },
   {
     icon: Droplet,
-    category: "Gübreler",
-    items: [
-      "Organik gübreler (ahır gübresi, kompost)",
-      "Kimyasal gübreler (NPK, üre)",
-      "Sıvı gübreler ve yaprak gübreleri",
-      "Toprak düzenleyiciler"
-    ],
     image: "https://images.unsplash.com/photo-1560493676-04071c5f467b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     color: "var(--accent-warning)",
   },
 ];
 
-export function Products() {
+export function Products({ language }: { language: GidaRadariLanguage }) {
+  const copy = homeCopy[language].products;
+
   return (
     <section id="products" className="py-20 lg:py-28" style={{ backgroundColor: 'var(--background-soft-green)' }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -61,7 +44,7 @@ export function Products() {
               color: 'var(--text-dark)',
             }}
           >
-            Ürünlerimiz
+            {copy.title}
           </h2>
           <p
             style={{
@@ -70,14 +53,17 @@ export function Products() {
               color: 'var(--text-gray)',
             }}
           >
-            Kaliteli tohum, fide ve gübre çeşitlerimiz
+            {copy.description}
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {products.map((product, index) => (
+          {productMeta.map((product, index) => {
+            const productCopy = copy.items[index];
+            const Icon = product.icon;
+            return (
             <motion.div
-              key={product.category}
+              key={productCopy.category}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -88,7 +74,7 @@ export function Products() {
               <div className="h-48 overflow-hidden">
                 <img
                   src={product.image}
-                  alt={product.category}
+                  alt={productCopy.category}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -99,7 +85,7 @@ export function Products() {
                     className="w-12 h-12 rounded-xl flex items-center justify-center"
                     style={{ backgroundColor: `${product.color}20` }}
                   >
-                    <product.icon size={24} style={{ color: product.color }} />
+                    <Icon size={24} style={{ color: product.color }} />
                   </div>
                   <h3
                     style={{
@@ -109,12 +95,12 @@ export function Products() {
                       color: 'var(--text-dark)',
                     }}
                   >
-                    {product.category}
+                    {productCopy.category}
                   </h3>
                 </div>
 
                 <ul className="space-y-3">
-                  {product.items.map((item, idx) => (
+                  {productCopy.items.map((item, idx) => (
                     <li
                       key={idx}
                       className="flex items-start gap-2"
@@ -141,11 +127,12 @@ export function Products() {
                     fontWeight: 600,
                   }}
                 >
-                  Detaylı Bilgi
+                  {copy.detail}
                 </motion.button>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         <motion.div
@@ -188,8 +175,7 @@ export function Products() {
                   maxWidth: '40rem',
                 }}
               >
-                Firma, ürün veya marka adını yazarak ya da etiket fotoğrafıyla T.C. Tarım ve
-                Orman Bakanlığı&apos;nın yayımladığı uygunsuzluk kayıtlarında arama yapabilirsiniz.
+                {copy.radarDescription}
               </p>
             </div>
 
@@ -205,7 +191,7 @@ export function Products() {
                   fontWeight: 600,
                 }}
               >
-                GıdaRadarı&apos;na git
+                {copy.radarLink}
                 <ArrowRight size={18} />
               </motion.span>
             </Link>

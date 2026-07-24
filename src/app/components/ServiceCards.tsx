@@ -1,31 +1,13 @@
 import { motion } from "motion/react";
 import { Sprout, Package, ShieldCheck } from "lucide-react";
+import { GidaRadariLanguage } from "./gida-radari/i18n";
+import { homeCopy } from "./home-i18n";
 
-const services = [
-  {
-    icon: Sprout,
-    title: "Sertifikalı Tohumlar",
-    description: "Sebze, tahıl ve organik tohum çeşitlerimiz. T.C. Tarım Bakanlığı onaylı, laboratuvar testli ürünler.",
-    link: "Hemen incele",
-    highlight: false,
-  },
-  {
-    icon: Package,
-    title: "Fide & Gübre",
-    description: "Meyve fidanları, sebze fideleri ve organik gübreler. Kaliteli üretim, uygun fiyat.",
-    link: "Hemen incele",
-    highlight: false,
-  },
-  {
-    icon: ShieldCheck,
-    title: "Gıda Güvenlik Skoru",
-    description: "Ürünlerin geçmiş hile kayıtları ve güvenlik skorları. T.C. Tarım Bakanlığı verileri.",
-    link: "Hemen incele",
-    highlight: true,
-  },
-];
+const serviceIcons = [Sprout, Package, ShieldCheck];
 
-export function ServiceCards() {
+export function ServiceCards({ language }: { language: GidaRadariLanguage }) {
+  const copy = homeCopy[language].services;
+
   return (
     <section className="py-20 lg:py-28" style={{ backgroundColor: 'var(--background-soft-green)' }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -44,12 +26,15 @@ export function ServiceCards() {
               color: 'var(--text-dark)',
             }}
           >
-            Hizmetlerimiz
+            {copy.title}
           </h2>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {services.map((service, index) => (
+          {copy.items.map((service, index) => {
+            const Icon = serviceIcons[index];
+            const highlight = index === 2;
+            return (
             <motion.div
               key={service.title}
               initial={{ opacity: 0, y: 30 }}
@@ -60,14 +45,14 @@ export function ServiceCards() {
               className="rounded-3xl p-8 shadow-lg transition-all duration-300"
               style={{
                 backgroundColor: 'var(--background-cream)',
-                borderLeft: service.highlight ? '4px solid var(--accent-warning)' : 'none',
+                borderLeft: highlight ? '4px solid var(--accent-warning)' : 'none',
               }}
             >
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
                 style={{ backgroundColor: 'var(--primary-green-light)' }}
               >
-                <service.icon size={32} style={{ color: 'var(--primary-green-dark)' }} />
+                <Icon size={32} style={{ color: 'var(--primary-green-dark)' }} />
               </div>
 
               <h3
@@ -104,10 +89,11 @@ export function ServiceCards() {
                   color: 'var(--primary-green-dark)',
                 }}
               >
-                {service.link} →
+                {copy.link} →
               </a>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

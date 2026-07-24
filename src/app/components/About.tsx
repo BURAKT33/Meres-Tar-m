@@ -1,7 +1,11 @@
 import { motion } from "motion/react";
 import { Leaf, Target } from "lucide-react";
+import { GidaRadariLanguage } from "./gida-radari/i18n";
+import { homeCopy } from "./home-i18n";
 
-export function About() {
+export function About({ language }: { language: GidaRadariLanguage }) {
+  const copy = homeCopy[language].about;
+
   return (
     <section id="about" className="py-20 lg:py-28" style={{ backgroundColor: 'var(--background-cream)' }}>
       <div className="max-w-6xl mx-auto px-6 lg:px-12">
@@ -21,7 +25,7 @@ export function About() {
               color: 'var(--text-dark)',
             }}
           >
-            Hakkımızda
+            {copy.title}
           </h2>
         </motion.div>
 
@@ -38,7 +42,7 @@ export function About() {
             >
               <img
                 src="https://images.unsplash.com/photo-1535379453347-1ffd615e2e08?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-                alt="Meres Tohum tarım alanları"
+                alt={copy.imageAlt}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -71,7 +75,7 @@ export function About() {
                     color: 'var(--text-dark)',
                   }}
                 >
-                  Meres Tohum Kimdir?
+                  {copy.whoTitle}
                 </h3>
                 <p
                   style={{
@@ -81,7 +85,7 @@ export function About() {
                     lineHeight: 1.7,
                   }}
                 >
-                  2026 yılından bu yana Türk tarımına hizmet eden Meres Tohum, kaliteli tohum, fide ve gübre üretimi ile çiftçilerimizin yanındadır. Organik ve sertifikalı ürünlerimizle sürdürülebilir tarımı destekliyoruz.
+                  {copy.whoDescription}
                 </p>
               </div>
             </div>
@@ -106,7 +110,7 @@ export function About() {
                     color: 'var(--text-dark)',
                   }}
                 >
-                  Neden Meres Tohum?
+                  {copy.whyTitle}
                 </h3>
                 <p
                   style={{
@@ -116,7 +120,7 @@ export function About() {
                     lineHeight: 1.7,
                   }}
                 >
-                  T.C. Tarım ve Orman Bakanlığı onaylı ürünlerimiz, laboratuvar testlerinden geçer. ISO 9001:2015 sertifikamızla kalite güvencesi sunarız. 40+ yıllık tecrübemizle 50.000+ çiftçiye hizmet verdik.
+                  {copy.whyDescription}
                 </p>
               </div>
             </div>

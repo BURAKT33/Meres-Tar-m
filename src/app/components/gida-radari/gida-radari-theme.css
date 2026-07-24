@@ -1,0 +1,10 @@
+.gida-radari-page {
+  --gr-bg: #fdfbf7;
+  --gr-primary: #a2b997;
+  --gr-helper: #e0f2f1;
+  --gr-cta: #ff8a65;
+  --gr-text: #2c3e43;
+  --gr-error: #e57373;
+  --gr-hint: #8fa599;
+  --gr-font: "Darker Grotesque", sans-serif;
+}

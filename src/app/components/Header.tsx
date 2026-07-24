@@ -1,25 +1,32 @@
 import { motion } from "motion/react";
-import { Menu, X } from "lucide-react";
+import { Globe2, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import logo from "@/assets/logo.png";
-
-const sectionItems = [
-  { label: "Ürünler", hash: "products" },
-  { label: "Hakkımızda", hash: "about" },
-  { label: "Vizyon & Misyon", hash: "vision" },
-  { label: "İletişim", hash: "contact" },
-];
+import { GidaRadariLanguage, gidaRadariLanguages } from "./gida-radari/i18n";
+import { homeCopy } from "./home-i18n";
 
 function sectionHref(hash: string, pathname: string) {
   return pathname === "/" ? `#${hash}` : `/#${hash}`;
 }
 
-export function Header() {
+type HeaderProps = {
+  language?: GidaRadariLanguage;
+  onLanguageChange?: (language: GidaRadariLanguage) => void;
+};
+
+export function Header({ language, onLanguageChange }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { pathname } = useLocation();
   const isHome = pathname === "/";
   const isGidaRadari = pathname === "/gida-radari";
+  const navigation = homeCopy[language ?? "tr"].navigation;
+  const sectionItems = [
+    { label: navigation.products, hash: "products" },
+    { label: navigation.about, hash: "about" },
+    { label: navigation.vision, hash: "vision" },
+    { label: navigation.contact, hash: "contact" },
+  ];
 
   const linkStyle = {
     fontFamily: "var(--font-body)",
@@ -72,7 +79,7 @@ export function Header() {
                     : "var(--text-dark)";
                 }}
               >
-                Ana Sayfa
+                {navigation.home}
               </Link>
             </motion.div>
 
@@ -93,7 +100,7 @@ export function Header() {
                     : "var(--text-dark)";
                 }}
               >
-                GıdaRadarı
+                {navigation.gidaRadari}
               </Link>
             </motion.div>
 
@@ -118,14 +125,46 @@ export function Header() {
             ))}
           </nav>
 
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2"
-            style={{ color: "var(--primary-green-dark)" }}
-            aria-label={isMenuOpen ? "Menüyü kapat" : "Menüyü aç"}
-          >
-            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+          <div className="flex items-center gap-2">
+            {language && onLanguageChange && (
+              <div
+                className="hidden lg:flex items-center gap-1 rounded-full p-1"
+                style={{
+                  backgroundColor: "rgba(162, 185, 151, 0.16)",
+                  border: "1px solid rgba(162, 185, 151, 0.45)",
+                }}
+                aria-label="Dil seçimi"
+              >
+                <Globe2 size={16} style={{ color: "var(--primary-green-dark)", marginLeft: "0.45rem" }} />
+                {gidaRadariLanguages.map((item) => (
+                  <button
+                    key={item.code}
+                    type="button"
+                    onClick={() => onLanguageChange(item.code)}
+                    className="rounded-full px-2.5 py-1 transition-colors"
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                      backgroundColor: language === item.code ? "var(--primary-green-dark)" : "transparent",
+                      color: language === item.code ? "#ffffff" : "var(--text-dark)",
+                    }}
+                    aria-pressed={language === item.code}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden p-2"
+              style={{ color: "var(--primary-green-dark)" }}
+              aria-label={isMenuOpen ? "Menüyü kapat" : "Menüyü aç"}
+            >
+              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
         </div>
 
         <motion.div
@@ -138,6 +177,36 @@ export function Header() {
           className="overflow-hidden lg:hidden"
         >
           <nav className="py-4 space-y-4">
+            {language && onLanguageChange && (
+              <div
+                className="flex items-center gap-2 pb-3"
+                style={{ borderBottom: "1px solid var(--border-light)" }}
+                aria-label="Dil seçimi"
+              >
+                <Globe2 size={18} style={{ color: "var(--primary-green-dark)" }} />
+                {gidaRadariLanguages.map((item) => (
+                  <button
+                    key={item.code}
+                    type="button"
+                    onClick={() => {
+                      onLanguageChange(item.code);
+                      setIsMenuOpen(false);
+                    }}
+                    className="rounded-full px-3 py-1.5"
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                      backgroundColor: language === item.code ? "var(--primary-green-dark)" : "rgba(162, 185, 151, 0.16)",
+                      color: language === item.code ? "#ffffff" : "var(--text-dark)",
+                    }}
+                    aria-pressed={language === item.code}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
             <Link
               to="/"
               className="block py-2 transition-colors"
@@ -149,7 +218,7 @@ export function Header() {
               }}
               onClick={() => setIsMenuOpen(false)}
             >
-              Ana Sayfa
+              {navigation.home}
             </Link>
             <Link
               to="/gida-radari"
@@ -162,7 +231,7 @@ export function Header() {
               }}
               onClick={() => setIsMenuOpen(false)}
             >
-              GıdaRadarı
+              {navigation.gidaRadari}
             </Link>
             {sectionItems.map((item) => (
               <a

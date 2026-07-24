@@ -1,0 +1,110 @@
+import { GidaRadariLanguage } from "./gida-radari/i18n";
+
+export const homeCopy = {
+  tr: {
+    navigation: {
+      home: "Ana Sayfa",
+      gidaRadari: "GıdaRadarı",
+      products: "Ürünler",
+      about: "Hakkımızda",
+      vision: "Vizyon & Misyon",
+      contact: "İletişim",
+    },
+    hero: {
+      title: "Toprağın gücü,\nsofraların güvencesi",
+      description: "Kaliteli tohum, fide ve gübre çözümleri. Bakanlık onaylı ürünlerle tarımda güvenilir ortak.",
+      products: "Ürünlerimizi Keşfet",
+      about: "Hakkımızda",
+      imageAlt: "Tarım alanları havadan görünüm",
+    },
+    services: {
+      title: "Hizmetlerimiz",
+      items: [
+        { title: "Sertifikalı Tohumlar", description: "Sebze, tahıl ve organik tohum çeşitlerimiz. T.C. Tarım Bakanlığı onaylı, laboratuvar testli ürünler." },
+        { title: "Fide & Gübre", description: "Meyve fidanları, sebze fideleri ve organik gübreler. Kaliteli üretim, uygun fiyat." },
+        { title: "Gıda Güvenlik Skoru", description: "Ürünlerin geçmiş hile kayıtları ve güvenlik skorları. T.C. Tarım Bakanlığı verileri." },
+      ],
+      link: "Hemen incele",
+    },
+    products: {
+      title: "Ürünlerimiz",
+      description: "Kaliteli tohum, fide ve gübre çeşitlerimiz",
+      detail: "Detaylı Bilgi",
+      items: [
+        { category: "Tohumlar", items: ["Sebze tohumları (domates, biber, patlıcan)", "Tahıl tohumları (buğday, arpa, mısır)", "Organik ve hibrit çeşitler", "Yerel tohum koleksiyonu"] },
+        { category: "Fideler", items: ["Meyve fidanları (elma, armut, şeftali)", "Sebze fideleri (domates, biber, salatalık)", "Süs bitkileri fidesi", "Aşılı ve sertifikalı fideler"] },
+        { category: "Gübreler", items: ["Organik gübreler (ahır gübresi, kompost)", "Kimyasal gübreler (NPK, üre)", "Sıvı gübreler ve yaprak gübreleri", "Toprak düzenleyiciler"] },
+      ],
+      radarDescription: "Firma, ürün veya marka adını yazarak ya da etiket fotoğrafıyla T.C. Tarım ve Orman Bakanlığı'nın yayımladığı uygunsuzluk kayıtlarında arama yapabilirsiniz.",
+      radarLink: "GıdaRadarı'na git",
+    },
+    about: {
+      title: "Hakkımızda",
+      imageAlt: "Meres Tohum tarım alanları",
+      whoTitle: "Meres Tohum Kimdir?",
+      whoDescription: "2026 yılından bu yana Türk tarımına hizmet eden Meres Tohum, kaliteli tohum, fide ve gübre üretimi ile çiftçilerimizin yanındadır. Organik ve sertifikalı ürünlerimizle sürdürülebilir tarımı destekliyoruz.",
+      whyTitle: "Neden Meres Tohum?",
+      whyDescription: "T.C. Tarım ve Orman Bakanlığı onaylı ürünlerimiz, laboratuvar testlerinden geçer. ISO 9001:2015 sertifikamızla kalite güvencesi sunarız. 40+ yıllık tecrübemizle 50.000+ çiftçiye hizmet verdik.",
+    },
+    vision: {
+      title: "Vizyon & Misyon",
+      visionTitle: "Vizyonumuz",
+      visionDescription: "Türkiye'nin en güvenilir tarımsal girdi tedarikçisi olarak, sürdürülebilir tarım uygulamalarını yaygınlaştırmak ve gelecek nesillere verimli topraklar bırakmak.",
+      visionItems: ["Organik tarımda lider marka", "Yenilikçi tohum teknolojileri", "Çevre dostu üretim süreçleri"],
+      missionTitle: "Misyonumuz",
+      missionDescription: "Çiftçilerimize en kaliteli tohum, fide ve gübre ürünlerini sunarak tarımsal verimliliği artırmak, gıda güvenliğini sağlamak ve kırsal kalkınmaya katkıda bulunmak.",
+      missionItems: ["Kalite kontrollü ürün garantisi", "Uygun fiyatlarla erişilebilirlik", "Teknik destek ve danışmanlık"],
+    },
+    contact: {
+      title: "İletişim",
+      description: "Sorularınız için bize ulaşın",
+      info: [
+        { title: "Telefon", subInfo: "Hafta içi 08:00 - 18:00" },
+        { title: "E-posta", subInfo: "24 saat içinde yanıt veriyoruz" },
+        { title: "Adres", subInfo: "" },
+        { title: "Çalışma Saatleri", subInfo: "Cumartesi: 09:00 - 14:00", info: "Pazartesi - Cuma: 08:00 - 18:00" },
+      ],
+      formTitle: "Bize Mesaj Gönderin",
+      fullName: "Ad Soyad",
+      fullNamePlaceholder: "Adınız ve soyadınız",
+      email: "E-posta",
+      message: "Mesajınız",
+      messagePlaceholder: "Mesajınızı buraya yazın...",
+      submit: "Mesaj Gönder",
+    },
+  },
+  en: {
+    navigation: { home: "Home", gidaRadari: "GıdaRadarı", products: "Products", about: "About Us", vision: "Vision & Mission", contact: "Contact" },
+    hero: { title: "The power of soil,\nthe confidence of your table", description: "Quality seedling, seed and fertiliser solutions. Your reliable agricultural partner with ministry-approved products.", products: "Explore Our Products", about: "About Us", imageAlt: "Aerial view of farmland" },
+    services: { title: "Our Services", items: [
+      { title: "Certified Seeds", description: "Our vegetable, grain and organic seed varieties. Ministry-approved and laboratory-tested products." },
+      { title: "Seedlings & Fertiliser", description: "Fruit saplings, vegetable seedlings and organic fertilisers. Quality production at fair prices." },
+      { title: "Food Safety Score", description: "Past adulteration records and safety scores for products. Based on Turkish Ministry of Agriculture data." },
+    ], link: "Explore now" },
+    products: { title: "Our Products", description: "Our quality seed, seedling and fertiliser varieties", detail: "Learn More", items: [
+      { category: "Seeds", items: ["Vegetable seeds (tomato, pepper, eggplant)", "Grain seeds (wheat, barley, corn)", "Organic and hybrid varieties", "Local seed collection"] },
+      { category: "Seedlings", items: ["Fruit saplings (apple, pear, peach)", "Vegetable seedlings (tomato, pepper, cucumber)", "Ornamental plant seedlings", "Grafted and certified seedlings"] },
+      { category: "Fertilisers", items: ["Organic fertilisers (manure, compost)", "Chemical fertilisers (NPK, urea)", "Liquid and foliar fertilisers", "Soil conditioners"] },
+    ], radarDescription: "Search the records of non-compliance published by the Turkish Ministry of Agriculture and Forestry using a company, product or brand name, or a label photo.", radarLink: "Go to GıdaRadarı" },
+    about: { title: "About Us", imageAlt: "Meres Tohum farmland", whoTitle: "Who Is Meres Tohum?", whoDescription: "Serving Turkish agriculture since 2026, Meres Tohum stands with farmers through quality seed, seedling and fertiliser production. We support sustainable agriculture with our organic and certified products.", whyTitle: "Why Meres Tohum?", whyDescription: "Our products approved by the Turkish Ministry of Agriculture and Forestry undergo laboratory testing. We offer quality assurance with our ISO 9001:2015 certificate and have served more than 50,000 farmers with 40+ years of experience." },
+    vision: { title: "Vision & Mission", visionTitle: "Our Vision", visionDescription: "To become Turkey's most trusted agricultural input supplier, expand sustainable farming practices and leave fertile soils to future generations.", visionItems: ["Leading brand in organic agriculture", "Innovative seed technologies", "Environmentally friendly production processes"], missionTitle: "Our Mission", missionDescription: "To increase agricultural productivity, ensure food safety and contribute to rural development by providing farmers with the highest-quality seeds, seedlings and fertilisers.", missionItems: ["Quality-controlled product guarantee", "Accessibility at fair prices", "Technical support and consultancy"] },
+    contact: { title: "Contact", description: "Contact us with your questions", info: [{ title: "Phone", subInfo: "Weekdays 08:00 - 18:00" }, { title: "Email", subInfo: "We reply within 24 hours" }, { title: "Address", subInfo: "" }, { title: "Business Hours", subInfo: "Saturday: 09:00 - 14:00", info: "Monday - Friday: 08:00 - 18:00" }], formTitle: "Send Us a Message", fullName: "Full Name", fullNamePlaceholder: "Your full name", email: "Email", message: "Your Message", messagePlaceholder: "Write your message here...", submit: "Send Message" },
+  },
+  ar: {
+    navigation: { home: "الرئيسية", gidaRadari: "رادار الغذاء", products: "المنتجات", about: "من نحن", vision: "الرؤية والرسالة", contact: "تواصل معنا" },
+    hero: { title: "قوة التربة،\nثقة مائدتك", description: "حلول عالية الجودة للبذور والشتلات والأسمدة. شريكك الزراعي الموثوق بمنتجات معتمدة من الوزارة.", products: "اكتشف منتجاتنا", about: "من نحن", imageAlt: "منظر جوي للأراضي الزراعية" },
+    services: { title: "خدماتنا", items: [
+      { title: "بذور معتمدة", description: "أصناف البذور النباتية والحبوب والعضوية. منتجات معتمدة من الوزارة ومختبرة مخبرياً." },
+      { title: "شتلات وأسمدة", description: "أشجار فاكهة وشتلات خضار وأسمدة عضوية. إنتاج عالي الجودة بأسعار مناسبة." },
+      { title: "درجة سلامة الغذاء", description: "سجلات الغش السابقة ودرجات سلامة المنتجات، استناداً إلى بيانات وزارة الزراعة التركية." },
+    ], link: "اكتشف الآن" },
+    products: { title: "منتجاتنا", description: "أصنافنا عالية الجودة من البذور والشتلات والأسمدة", detail: "معلومات تفصيلية", items: [
+      { category: "البذور", items: ["بذور الخضار (الطماطم، الفلفل، الباذنجان)", "بذور الحبوب (القمح، الشعير، الذرة)", "أصناف عضوية وهجينة", "مجموعة البذور المحلية"] },
+      { category: "الشتلات", items: ["شتلات الفاكهة (التفاح، الكمثرى، الخوخ)", "شتلات الخضار (الطماطم، الفلفل، الخيار)", "شتلات نباتات الزينة", "شتلات مطعمة ومعتمدة"] },
+      { category: "الأسمدة", items: ["أسمدة عضوية (سماد حيواني، كومبوست)", "أسمدة كيميائية (NPK، يوريا)", "أسمدة سائلة وورقية", "محسّنات التربة"] },
+    ], radarDescription: "ابحث في سجلات المخالفات المنشورة من وزارة الزراعة والغابات التركية باسم الشركة أو المنتج أو العلامة التجارية، أو باستخدام صورة الملصق.", radarLink: "اذهب إلى رادار الغذاء" },
+    about: { title: "من نحن", imageAlt: "أراضي Meres Tohum الزراعية", whoTitle: "من هي Meres Tohum؟", whoDescription: "تخدم Meres Tohum الزراعة التركية منذ عام 2026 وتقف إلى جانب المزارعين من خلال إنتاج بذور وشتلات وأسمدة عالية الجودة. ندعم الزراعة المستدامة بمنتجاتنا العضوية والمعتمدة.", whyTitle: "لماذا Meres Tohum؟", whyDescription: "تخضع منتجاتنا المعتمدة من وزارة الزراعة والغابات التركية لاختبارات مخبرية. نقدّم ضمان الجودة بشهادة ISO 9001:2015 وخدمنا أكثر من 50,000 مزارع بخبرة تزيد على 40 عاماً." },
+    vision: { title: "الرؤية والرسالة", visionTitle: "رؤيتنا", visionDescription: "أن نكون المورد الزراعي الأكثر موثوقية في تركيا، وأن نوسّع ممارسات الزراعة المستدامة ونترك تربة خصبة للأجيال القادمة.", visionItems: ["علامة رائدة في الزراعة العضوية", "تقنيات بذور مبتكرة", "عمليات إنتاج صديقة للبيئة"], missionTitle: "رسالتنا", missionDescription: "زيادة الإنتاجية الزراعية وضمان سلامة الغذاء والمساهمة في التنمية الريفية من خلال تقديم أفضل البذور والشتلات والأسمدة للمزارعين.", missionItems: ["ضمان منتجات مراقبة الجودة", "إتاحة بأسعار مناسبة", "دعم فني واستشارات"] },
+    contact: { title: "تواصل معنا", description: "تواصل معنا لأسئلتك", info: [{ title: "الهاتف", subInfo: "أيام الأسبوع 08:00 - 18:00" }, { title: "البريد الإلكتروني", subInfo: "نرد خلال 24 ساعة" }, { title: "العنوان", subInfo: "" }, { title: "ساعات العمل", subInfo: "السبت: 09:00 - 14:00", info: "الاثنين - الجمعة: 08:00 - 18:00" }], formTitle: "أرسل لنا رسالة", fullName: "الاسم الكامل", fullNamePlaceholder: "اسمك الكامل", email: "البريد الإلكتروني", message: "رسالتك", messagePlaceholder: "اكتب رسالتك هنا...", submit: "إرسال الرسالة" },
+  },
+} as const satisfies Record<GidaRadariLanguage, unknown>;

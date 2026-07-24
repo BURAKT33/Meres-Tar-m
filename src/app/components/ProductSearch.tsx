@@ -18,11 +18,18 @@ import {
   searchGidaRadariFromOcrText,
   searchGidaRadariRecords,
 } from "@/lib/gidaradariSearch";
+import { GidaRadariLanguage, gidaRadariCopy } from "./gida-radari/i18n";
 
 type SearchMode = "text" | "camera";
 type SearchStep = "idle" | "processing" | "reading" | "searching";
 
-function SearchResultCard({ record, score }: GidaRadariMatch) {
+function SearchResultCard({
+  record,
+  score,
+  language,
+}: GidaRadariMatch & { language: GidaRadariLanguage }) {
+  const copy = gidaRadariCopy[language].search;
+
   return (
     <div
       className="rounded-3xl p-6 shadow-lg"
@@ -59,7 +66,7 @@ function SearchResultCard({ record, score }: GidaRadariMatch) {
                 fontFamily: "var(--font-body)",
               }}
             >
-              %{score} eşleşme
+              %{score} {copy.match}
             </span>
           </div>
 
@@ -72,7 +79,7 @@ function SearchResultCard({ record, score }: GidaRadariMatch) {
             }}
           >
             <Building2 size={14} className="mt-1 flex-shrink-0" />
-            <span>Ürün: {record.product}</span>
+            <span>{copy.product}: {record.product}</span>
           </p>
 
           <p
@@ -83,7 +90,7 @@ function SearchResultCard({ record, score }: GidaRadariMatch) {
               color: "var(--text-gray)",
             }}
           >
-            Uygunsuzluk: {record.issue}
+            {copy.issue}: {record.issue}
           </p>
 
           <p
@@ -107,9 +114,9 @@ function SearchResultCard({ record, score }: GidaRadariMatch) {
               lineHeight: 1.6,
             }}
           >
-            Kaynak: {record.sourceLabel}
+            {copy.source}: {record.sourceLabel}
             <br />
-            (T.C. Tarım ve Orman Bakanlığı resmi kayıtları)
+            {copy.officialSource}
           </p>
         </div>
       </div>
@@ -117,7 +124,21 @@ function SearchResultCard({ record, score }: GidaRadariMatch) {
   );
 }
 
-export function ProductSearch() {
+export function ProductSearch({
+  variant = "default",
+  language = "tr",
+}: {
+  variant?: "default" | "gidaradari";
+  language?: GidaRadariLanguage;
+}) {
+  const isGidaRadari = variant === "gidaradari";
+  const copy = gidaRadariCopy[language].search;
+  const bgColor = isGidaRadari ? "var(--gr-bg)" : "var(--background-cream)";
+  const accentColor = isGidaRadari ? "var(--gr-cta)" : "var(--accent-warning)";
+  const fontFamily = isGidaRadari ? "var(--gr-font)" : "var(--font-body)";
+  const headingFont = isGidaRadari ? "var(--gr-font)" : "var(--font-heading)";
+  const textDark = isGidaRadari ? "var(--gr-text)" : "var(--text-dark)";
+  const textGray = isGidaRadari ? "var(--gr-hint)" : "var(--text-gray)";
   const [mode, setMode] = useState<SearchMode>("text");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GidaRadariMatch[]>([]);
@@ -188,7 +209,7 @@ export function ProductSearch() {
       const message =
         searchError instanceof Error
           ? searchError.message
-          : "Arama sırasında bir hata oluştu.";
+          : copy.searchError;
       setError(message);
       setResults([]);
       setHasSearched(true);
@@ -213,7 +234,7 @@ export function ProductSearch() {
   const handleCameraSearch = async () => {
     const file = selectedFileRef.current;
     if (!file) {
-      setError("Lütfen önce ürün fotoğrafı çekin veya yükleyin.");
+      setError(copy.selectPhotoError);
       return;
     }
 
@@ -246,7 +267,7 @@ export function ProductSearch() {
       const message =
         searchError instanceof Error
           ? searchError.message
-          : "Görsel analizi sırasında bir hata oluştu.";
+          : copy.imageError;
       setError(message);
       setHasSearched(true);
     } finally {
@@ -257,15 +278,15 @@ export function ProductSearch() {
 
   const searchStepLabel =
     searchStep === "processing"
-      ? "Fotoğraf işleniyor..."
+      ? copy.processing
       : searchStep === "reading"
-        ? "Etiket okunuyor..."
+        ? copy.reading
         : searchStep === "searching"
-          ? "Kayıtlar aranıyor..."
-          : "Analiz ediliyor";
+          ? copy.recordsSearching
+          : copy.analyzing;
 
   return (
-    <section className="py-20 lg:py-28" style={{ backgroundColor: "var(--background-cream)" }}>
+    <section className="py-20 lg:py-28" style={{ backgroundColor: bgColor }}>
       <div className="max-w-5xl mx-auto px-6 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -277,17 +298,17 @@ export function ProductSearch() {
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-5"
             style={{
-              backgroundColor: "rgba(255, 140, 66, 0.12)",
-              border: "1px solid var(--accent-warning)",
+              backgroundColor: isGidaRadari ? "rgba(255, 138, 101, 0.12)" : "rgba(255, 140, 66, 0.12)",
+              border: `1px solid ${accentColor}`,
             }}
           >
-            <Radar size={18} style={{ color: "var(--accent-warning)" }} />
+            <Radar size={18} style={{ color: accentColor }} />
             <span
               style={{
-                fontFamily: "var(--font-body)",
+                fontFamily,
                 fontSize: "0.95rem",
                 fontWeight: 600,
-                color: "var(--accent-warning)",
+                color: accentColor,
               }}
             >
               GıdaRadarı
@@ -296,26 +317,27 @@ export function ProductSearch() {
           <h2
             className="mb-4"
             style={{
-              fontFamily: "var(--font-heading)",
+              fontFamily: headingFont,
               fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
               fontWeight: 600,
-              color: "var(--text-dark)",
+              color: textDark,
             }}
           >
-            Bakanlık kayıtlarında sorgula
+            {isGidaRadari ? copy.title : "Bakanlık kayıtlarında sorgula"}
           </h2>
           <p
             style={{
-              fontFamily: "var(--font-body)",
+              fontFamily,
               fontSize: "1.125rem",
-              color: "var(--text-gray)",
+              color: textGray,
               maxWidth: "36rem",
               margin: "0 auto",
               lineHeight: 1.6,
             }}
           >
-            Yazarak veya kamera ile firma, ürün ya da marka arayın. Veriler T.C. Tarım ve
-            Orman Bakanlığı&apos;nın yayımladığı kayıtlardan alınır.
+            {isGidaRadari
+              ? copy.description
+              : "Yazarak veya kamera ile firma, ürün ya da marka arayın. Veriler T.C. Tarım ve Orman Bakanlığı'nın yayımladığı kayıtlardan alınır."}
           </p>
         </motion.div>
 
@@ -325,30 +347,30 @@ export function ProductSearch() {
             onClick={() => handleModeChange("text")}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full transition-all"
             style={{
-              backgroundColor: mode === "text" ? "var(--accent-warning)" : "#ffffff",
-              color: mode === "text" ? "#ffffff" : "var(--text-dark)",
+              backgroundColor: mode === "text" ? accentColor : "#ffffff",
+              color: mode === "text" ? "#ffffff" : textDark,
               border: "2px solid var(--border-light)",
-              fontFamily: "var(--font-body)",
+              fontFamily,
               fontWeight: 600,
             }}
           >
             <Type size={18} />
-            Yazı ile ara
+            {copy.textMode}
           </button>
           <button
             type="button"
             onClick={() => handleModeChange("camera")}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full transition-all"
             style={{
-              backgroundColor: mode === "camera" ? "var(--accent-warning)" : "#ffffff",
-              color: mode === "camera" ? "#ffffff" : "var(--text-dark)",
+              backgroundColor: mode === "camera" ? accentColor : "#ffffff",
+              color: mode === "camera" ? "#ffffff" : textDark,
               border: "2px solid var(--border-light)",
-              fontFamily: "var(--font-body)",
+              fontFamily,
               fontWeight: 600,
             }}
           >
             <Camera size={18} />
-            Kamera ile ara
+            {copy.cameraMode}
           </button>
         </div>
 
@@ -369,17 +391,17 @@ export function ProductSearch() {
               }}
             >
               <div className="flex-1 flex items-center gap-3 px-4">
-                <Search size={24} style={{ color: "var(--text-gray)" }} />
+                <Search size={24} style={{ color: textGray }} />
                 <input
                   type="text"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Firma, ürün veya marka adı gir (örnek: Yöre Bal, peynir, sucuk)"
+                  placeholder={copy.placeholder}
                   className="flex-1 bg-transparent outline-none"
                   style={{
-                    fontFamily: "var(--font-body)",
+                    fontFamily,
                     fontSize: "1rem",
-                    color: "var(--text-dark)",
+                    color: textDark,
                   }}
                   disabled={isLoadingData}
                 />
@@ -392,19 +414,19 @@ export function ProductSearch() {
                 disabled={isLoadingData || isSearching || !query.trim()}
                 className="px-8 py-3 rounded-full transition-all shadow-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 style={{
-                  backgroundColor: "var(--accent-warning)",
+                  backgroundColor: accentColor,
                   color: "#ffffff",
-                  fontFamily: "var(--font-body)",
+                  fontFamily,
                   fontWeight: 600,
                 }}
               >
                 {isSearching ? (
                   <>
                     <Loader2 size={18} className="animate-spin" />
-                    Aranıyor
+                    {copy.searching}
                   </>
                 ) : (
-                  "Sorgula"
+                  copy.search
                 )}
               </motion.button>
             </div>
@@ -440,7 +462,7 @@ export function ProductSearch() {
                 >
                   <Camera size={40} className="mx-auto mb-3" style={{ color: "var(--text-gray)" }} />
                   <p style={{ fontFamily: "var(--font-body)", color: "var(--text-gray)" }}>
-                    Ürün etiketinin fotoğrafını çekin veya galeriden seçin
+                    {copy.photoPrompt}
                   </p>
                 </div>
               )}
@@ -459,7 +481,7 @@ export function ProductSearch() {
                     color: "var(--text-dark)",
                   }}
                 >
-                  Fotoğraf Çek / Seç
+                  {copy.takePhoto}
                 </button>
 
                 <motion.button
@@ -470,9 +492,9 @@ export function ProductSearch() {
                   disabled={isLoadingData || isSearching || !previewUrl}
                   className="flex-1 px-6 py-3 rounded-full disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   style={{
-                    backgroundColor: "var(--accent-warning)",
+                    backgroundColor: accentColor,
                     color: "#ffffff",
-                    fontFamily: "var(--font-body)",
+                    fontFamily,
                     fontWeight: 600,
                   }}
                 >
@@ -482,7 +504,7 @@ export function ProductSearch() {
                       {searchStepLabel}
                     </>
                   ) : (
-                    "Etiketi Oku ve Ara"
+                    copy.readAndSearch
                   )}
                 </motion.button>
               </div>
@@ -516,11 +538,11 @@ export function ProductSearch() {
           >
             {detectedBrands.length > 0 && (
               <p className="mb-2">
-                <strong style={{ color: "var(--text-dark)" }}>Algılanan marka:</strong>{" "}
+                <strong style={{ color: "var(--text-dark)" }}>{copy.detectedBrand}</strong>{" "}
                 {detectedBrands.join(" · ")}
               </p>
             )}
-            <strong style={{ color: "var(--text-dark)" }}>Okunan yazılar:</strong>
+            <strong style={{ color: "var(--text-dark)" }}>{copy.detectedText}</strong>
             <p className="mt-2 whitespace-pre-wrap text-sm">{detectedText}</p>
           </div>
         )}
@@ -557,7 +579,7 @@ export function ProductSearch() {
                         color: "var(--text-dark)",
                       }}
                     >
-                      Kayıt bulunamadı
+                      {copy.noRecord}
                     </h4>
                     <p
                       style={{
@@ -567,8 +589,7 @@ export function ProductSearch() {
                         lineHeight: 1.6,
                       }}
                     >
-                      <strong>{detectedBrands[0] ?? "Bu marka"}</strong> için Bakanlık
-                      kayıtlarında uygunsuzluk tespiti bulunamadı.
+                      <strong>{detectedBrands[0] ?? "Bu marka"}</strong> {copy.noRecordDetail}
                     </p>
                   </div>
                 </div>
@@ -583,8 +604,8 @@ export function ProductSearch() {
                     color: "var(--text-gray)",
                   }}
                 >
-                  <strong style={{ color: "var(--text-dark)" }}>{results.length}</strong> eşleşen
-                  firma / marka listelendi
+                  <strong style={{ color: "var(--text-dark)" }}>{results.length}</strong>{" "}
+                  {copy.matchedCount}
                 </p>
 
                 {results.map((match, index) => (
@@ -594,7 +615,7 @@ export function ProductSearch() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
                   >
-                    <SearchResultCard {...match} />
+                    <SearchResultCard {...match} language={language} />
                   </motion.div>
                 ))}
               </>
@@ -614,8 +635,8 @@ export function ProductSearch() {
                   }}
                 >
                   {mode === "camera"
-                    ? "Fotoğraftaki yazılara yakın bir firma veya marka kaydı bulunamadı."
-                    : "Aramanıza yakın bir firma veya ürün kaydı bulunamadı."}
+                      ? copy.noCameraResult
+                    : copy.noTextResult}
                 </p>
               </div>
             )}
@@ -634,10 +655,10 @@ export function ProductSearch() {
             }}
           >
             {isLoadingData
-              ? "Kayıtlar yükleniyor..."
+              ? copy.loading
               : mode === "camera"
-                ? "Ürün etiketini net çekin; yazılar okunup Bakanlık kayıtlarında aranır."
-                : "Firma, ürün veya marka adı ile Bakanlık kayıtlarında arama yapabilirsiniz."}
+                ? copy.initialCameraHint
+                : copy.initialTextHint}
           </motion.p>
         )}
       </div>
