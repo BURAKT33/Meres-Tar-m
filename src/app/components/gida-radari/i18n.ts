@@ -37,7 +37,7 @@ export const gidaRadariCopy = {
         },
       ],
       stats: [
-        { value: "3.000+", label: "Sabıkalı Ürün Verisi" },
+        { value: "1500+", label: "Sabıkalı Ürün Verisi" },
         { value: "%100", label: "Resmi Bakanlık Kaynağı" },
         { value: "~2 Sn", label: "Analiz ve Sonuç Süresi" },
       ],
@@ -125,7 +125,7 @@ export const gidaRadariCopy = {
         },
       ],
       stats: [
-        { value: "3,000+", label: "Flagged Product Records" },
+        { value: "1500+", label: "Flagged Product Records" },
         { value: "100%", label: "Official Ministry Source" },
         { value: "~2 sec", label: "Analysis & Result Time" },
       ],
@@ -213,7 +213,7 @@ export const gidaRadariCopy = {
         },
       ],
       stats: [
-        { value: "+3,000", label: "سجل لمنتجات مخالِفة" },
+        { value: "+1500", label: "سجل لمنتجات مخالِفة" },
         { value: "100%", label: "مصدر رسمي من الوزارة" },
         { value: "ثانيتان", label: "مدة التحليل والنتيجة" },
       ],
