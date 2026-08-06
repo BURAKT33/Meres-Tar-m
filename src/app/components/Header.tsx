@@ -3,6 +3,7 @@ import { Globe2, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import logo from "@/assets/logo.png";
+import { GIDA_AJANI_URL } from "../constants";
 import { GidaRadariLanguage, gidaRadariLanguages } from "./gida-radari/i18n";
 import { homeCopy } from "./home-i18n";
 
@@ -19,7 +20,6 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { pathname } = useLocation();
   const isHome = pathname === "/";
-  const isGidaRadari = pathname === "/gida-radari";
   const navigation = homeCopy[language ?? "tr"].navigation;
   const sectionItems = [
     { label: navigation.products, hash: "products" },
@@ -88,20 +88,20 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.05 }}
             >
-              <Link
-                to="/gida-radari"
-                style={isGidaRadari ? activeStyle : linkStyle}
+              <a
+                href={GIDA_AJANI_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={linkStyle}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = "var(--primary-green-dark)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = isGidaRadari
-                    ? "var(--primary-green-dark)"
-                    : "var(--text-dark)";
+                  e.currentTarget.style.color = "var(--text-dark)";
                 }}
               >
-                {navigation.gidaRadari}
-              </Link>
+                {navigation.gidaAjani}
+              </a>
             </motion.div>
 
             {sectionItems.map((item, index) => (
@@ -220,19 +220,21 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
             >
               {navigation.home}
             </Link>
-            <Link
-              to="/gida-radari"
+            <a
+              href={GIDA_AJANI_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="block py-2 transition-colors"
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "1rem",
-                fontWeight: isGidaRadari ? 600 : 500,
-                color: isGidaRadari ? "var(--primary-green-dark)" : "var(--text-dark)",
+                fontWeight: 500,
+                color: "var(--text-dark)",
               }}
               onClick={() => setIsMenuOpen(false)}
             >
-              {navigation.gidaRadari}
-            </Link>
+              {navigation.gidaAjani}
+            </a>
             {sectionItems.map((item) => (
               <a
                 key={item.label}

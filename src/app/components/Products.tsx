@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
-import { Sprout, Trees, Droplet, Radar, ArrowRight } from "lucide-react";
-import { Link } from "react-router";
+import { Sprout, Trees, Droplet, ScanSearch, ArrowRight } from "lucide-react";
+import { GIDA_AJANI_URL } from "../constants";
 import { GidaRadariLanguage } from "./gida-radari/i18n";
 import { homeCopy } from "./home-i18n";
 
@@ -23,7 +23,7 @@ const productMeta = [
 ];
 
 export function Products({ language }: { language: GidaRadariLanguage }) {
-  const copy = homeCopy[language].products;
+  const { navigation, products: copy } = homeCopy[language];
 
   return (
     <section id="products" className="py-20 lg:py-28" style={{ backgroundColor: 'var(--background-soft-green)' }}>
@@ -151,7 +151,7 @@ export function Products({ language }: { language: GidaRadariLanguage }) {
               className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
               style={{ backgroundColor: 'rgba(255, 140, 66, 0.12)' }}
             >
-              <Radar size={28} style={{ color: 'var(--accent-warning)' }} />
+              <ScanSearch size={28} style={{ color: 'var(--accent-warning)' }} />
             </div>
 
             <div className="flex-1">
@@ -164,7 +164,7 @@ export function Products({ language }: { language: GidaRadariLanguage }) {
                   color: 'var(--text-dark)',
                 }}
               >
-                GıdaRadarı
+                {navigation.gidaAjani}
               </h3>
               <p
                 style={{
@@ -175,11 +175,16 @@ export function Products({ language }: { language: GidaRadariLanguage }) {
                   maxWidth: '40rem',
                 }}
               >
-                {copy.radarDescription}
+                {copy.gidaAjaniDescription}
               </p>
             </div>
 
-            <Link to="/gida-radari" className="flex-shrink-0">
+            <a
+              href={GIDA_AJANI_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0"
+            >
               <motion.span
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
@@ -191,10 +196,10 @@ export function Products({ language }: { language: GidaRadariLanguage }) {
                   fontWeight: 600,
                 }}
               >
-                {copy.radarLink}
+                {copy.gidaAjaniLink}
                 <ArrowRight size={18} />
               </motion.span>
-            </Link>
+            </a>
           </div>
         </motion.div>
       </div>
