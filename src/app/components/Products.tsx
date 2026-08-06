@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { Sprout, Trees, Droplet, ScanSearch, ArrowRight } from "lucide-react";
 import { GIDA_AJANI_URL } from "../constants";
+import { GidaAjaniBrand } from "./GidaAjaniBrand";
 import { GidaRadariLanguage } from "./gida-radari/i18n";
 import { homeCopy } from "./home-i18n";
 
@@ -164,7 +165,7 @@ export function Products({ language }: { language: GidaRadariLanguage }) {
                   color: 'var(--text-dark)',
                 }}
               >
-                {navigation.gidaAjani}
+                <GidaAjaniBrand label={navigation.gidaAjani} logoHeight={28} />
               </h3>
               <p
                 style={{
@@ -196,7 +197,7 @@ export function Products({ language }: { language: GidaRadariLanguage }) {
                   fontWeight: 600,
                 }}
               >
-                {copy.gidaAjaniLink}
+                <GidaAjaniBrand label={copy.gidaAjaniLink} logoHeight={18} />
                 <ArrowRight size={18} />
               </motion.span>
             </a>

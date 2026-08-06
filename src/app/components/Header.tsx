@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import logo from "@/assets/logo.png";
 import { GIDA_AJANI_URL } from "../constants";
+import { GidaAjaniBrand } from "./GidaAjaniBrand";
 import { GidaRadariLanguage, gidaRadariLanguages } from "./gida-radari/i18n";
 import { homeCopy } from "./home-i18n";
 
@@ -100,7 +101,7 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
                   e.currentTarget.style.color = "var(--text-dark)";
                 }}
               >
-                {navigation.gidaAjani}
+                <GidaAjaniBrand label={navigation.gidaAjani} logoHeight={18} />
               </a>
             </motion.div>
 
@@ -233,7 +234,7 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
               }}
               onClick={() => setIsMenuOpen(false)}
             >
-              {navigation.gidaAjani}
+              <GidaAjaniBrand label={navigation.gidaAjani} logoHeight={20} />
             </a>
             {sectionItems.map((item) => (
               <a
